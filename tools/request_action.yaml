@@ -1,0 +1,43 @@
+identity:
+  name: request_action
+  author: asqav
+  label:
+    en_US: Request Action
+    zh_Hans: Request Action
+    pt_BR: Request Action
+description:
+  human:
+    en_US: Request a multi-party authorized action. Creates a signing session that requires entity approvals before the action is authorized. Use this as a pre-execution gate for high-risk actions.
+    zh_Hans: Request a multi-party authorized action. Creates a signing session that requires entity approvals before the action is authorized. Use this as a pre-execution gate for high-risk actions.
+    pt_BR: Request a multi-party authorized action. Creates a signing session that requires entity approvals before the action is authorized. Use this as a pre-execution gate for high-risk actions.
+  llm: Request a multi-party authorized action for an agent. Creates a signing session that requires multiple entity approvals. Returns the session ID, status, required approvals count, and current signatures collected. Use this as a gate before executing high-risk actions.
+parameters:
+  - name: action_type
+    type: string
+    required: true
+    label:
+      en_US: Action Type
+      zh_Hans: Action Type
+      pt_BR: Action Type
+    human_description:
+      en_US: Type of action requiring authorization, e.g. "deploy:production"
+      zh_Hans: Type of action requiring authorization, e.g. "deploy:production"
+      pt_BR: Type of action requiring authorization, e.g. "deploy:production"
+    llm_description: The action type that needs multi-party authorization. Examples - "deploy:production", "delete:resource", "transfer:funds".
+    form: llm
+  - name: params
+    type: string
+    required: false
+    label:
+      en_US: Parameters (JSON)
+      zh_Hans: Parameters (JSON)
+      pt_BR: Parameters (JSON)
+    human_description:
+      en_US: Optional JSON string with parameters for the action
+      zh_Hans: Optional JSON string with parameters for the action
+      pt_BR: Optional JSON string with parameters for the action
+    llm_description: Optional JSON string with parameters for the action. Example - {"target":"us-east-1","version":"2.0"}
+    form: llm
+extra:
+  python:
+    source: tools/request_action.py

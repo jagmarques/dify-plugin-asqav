@@ -1,0 +1,43 @@
+identity:
+  name: sign_action
+  author: asqav
+  label:
+    en_US: Sign Action
+    zh_Hans: Sign Action
+    pt_BR: Sign Action
+description:
+  human:
+    en_US: Sign an agent action with ML-DSA-65 post-quantum cryptography. Creates a tamper-evident audit record via asqav.com. Returns the signature ID and verification URL.
+    zh_Hans: Sign an agent action with ML-DSA-65 post-quantum cryptography. Creates a tamper-evident audit record via asqav.com. Returns the signature ID and verification URL.
+    pt_BR: Sign an agent action with ML-DSA-65 post-quantum cryptography. Creates a tamper-evident audit record via asqav.com. Returns the signature ID and verification URL.
+  llm: Sign an agent action with ML-DSA-65 post-quantum cryptography. Provide an action_type string (e.g. "read:data", "api:call", "tool:execute") and optional context as a JSON string. Returns the signature ID, action ID, timestamp, and a public verification URL.
+parameters:
+  - name: action_type
+    type: string
+    required: true
+    label:
+      en_US: Action Type
+      zh_Hans: Action Type
+      pt_BR: Action Type
+    human_description:
+      en_US: Type of action being signed, e.g. "read:data", "api:call", "tool:execute"
+      zh_Hans: Type of action being signed, e.g. "read:data", "api:call", "tool:execute"
+      pt_BR: Type of action being signed, e.g. "read:data", "api:call", "tool:execute"
+    llm_description: The action type string that identifies the kind of action being signed. Examples - "read:data", "api:call", "tool:execute", "deploy:production".
+    form: llm
+  - name: context
+    type: string
+    required: false
+    label:
+      en_US: Context (JSON)
+      zh_Hans: Context (JSON)
+      pt_BR: Context (JSON)
+    human_description:
+      en_US: Optional JSON string with additional context for the action
+      zh_Hans: Optional JSON string with additional context for the action
+      pt_BR: Optional JSON string with additional context for the action
+    llm_description: Optional JSON string with metadata about the action. Example - {"file":"config.json","user":"admin"}
+    form: llm
+extra:
+  python:
+    source: tools/sign_action.py

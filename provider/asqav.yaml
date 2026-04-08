@@ -1,0 +1,53 @@
+identity:
+  author: asqav
+  name: asqav
+  label:
+    en_US: asqav
+    zh_Hans: asqav
+    pt_BR: asqav
+  description:
+    en_US: Post-quantum agent signing and verification. Sign agent actions with ML-DSA-65 via asqav.com.
+    zh_Hans: Post-quantum agent signing and verification. Sign agent actions with ML-DSA-65 via asqav.com.
+    pt_BR: Post-quantum agent signing and verification. Sign agent actions with ML-DSA-65 via asqav.com.
+  icon: icon.svg
+  tags:
+    - utilities
+credentials_for_provider:
+  asqav_api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: asqav API Key
+      zh_Hans: asqav API Key
+      pt_BR: asqav API Key
+    placeholder:
+      en_US: Enter your asqav API key (sk_...)
+      zh_Hans: Enter your asqav API key (sk_...)
+      pt_BR: Enter your asqav API key (sk_...)
+    help:
+      en_US: Get your API key at asqav.com
+      zh_Hans: Get your API key at asqav.com
+      pt_BR: Get your API key at asqav.com
+    url: https://asqav.com
+  asqav_agent_id:
+    type: text-input
+    required: true
+    label:
+      en_US: Agent ID
+      zh_Hans: Agent ID
+      pt_BR: Agent ID
+    placeholder:
+      en_US: Your asqav agent ID (agent_...)
+      zh_Hans: Your asqav agent ID (agent_...)
+      pt_BR: Your asqav agent ID (agent_...)
+    help:
+      en_US: The agent ID to use for signing actions
+      zh_Hans: The agent ID to use for signing actions
+      pt_BR: The agent ID to use for signing actions
+tools:
+  - tools/sign_action.yaml
+  - tools/verify_signature.yaml
+  - tools/request_action.yaml
+extra:
+  python:
+    source: provider/asqav.py
