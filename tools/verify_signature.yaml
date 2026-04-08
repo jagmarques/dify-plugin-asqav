@@ -1,0 +1,30 @@
+identity:
+  name: verify_signature
+  author: asqav
+  label:
+    en_US: Verify Signature
+    zh_Hans: Verify Signature
+    pt_BR: Verify Signature
+description:
+  human:
+    en_US: Verify an asqav signature by its ID. This is a public endpoint that requires no authentication. Returns whether the signature is valid, the agent that created it, and the action details.
+    zh_Hans: Verify an asqav signature by its ID. This is a public endpoint that requires no authentication. Returns whether the signature is valid, the agent that created it, and the action details.
+    pt_BR: Verify an asqav signature by its ID. This is a public endpoint that requires no authentication. Returns whether the signature is valid, the agent that created it, and the action details.
+  llm: Verify an asqav signature by its signature ID. Returns verification status, the signing agent name/ID, the action type, and the timestamp. No authentication needed.
+parameters:
+  - name: signature_id
+    type: string
+    required: true
+    label:
+      en_US: Signature ID
+      zh_Hans: Signature ID
+      pt_BR: Signature ID
+    human_description:
+      en_US: The signature ID to verify (e.g. sig_abc123)
+      zh_Hans: The signature ID to verify (e.g. sig_abc123)
+      pt_BR: The signature ID to verify (e.g. sig_abc123)
+    llm_description: The asqav signature ID to verify. Usually starts with "sig_".
+    form: llm
+extra:
+  python:
+    source: tools/verify_signature.py
