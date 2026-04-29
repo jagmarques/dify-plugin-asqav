@@ -10,6 +10,20 @@ Post-quantum agent signing and verification for Dify workflows.
 
 This plugin connects Dify workflows to the [asqav](https://asqav.com) API, adding ML-DSA-65 post-quantum cryptographic signing to agent actions. Every signed action creates a tamper-evident audit record that anyone can verify.
 
+## Data handling
+
+This plugin calls the Asqav cloud API (`https://api.asqav.com`) directly from your Dify deployment. Action context (`action_type` and any `context` JSON you pass) is transmitted to the cloud where it is signed with ML-DSA-65. The cloud applies GDPR-aware data minimization: only the metadata bag (action_type, agent_id, session_id, model_name, tool_name) is retained alongside a hash of the rest where possible.
+
+If you need client-side hash-only behavior, use the `asqav` Python SDK directly in your Dify workflow alongside this plugin:
+
+```python
+import asqav
+
+asqav.init(api_key="sk_...", base_url="https://api.asqav.com", mode="hash-only")
+```
+
+The plugin inherits the SDK's `mode` behavior whenever it is invoked through the SDK rather than directly. See `docs/canonicalization.md` in the SDK repo for the canonicalization spec and conformance vectors.
+
 ## Tools
 
 ### Sign Action
