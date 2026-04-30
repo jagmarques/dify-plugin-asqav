@@ -8,7 +8,7 @@ Post-quantum agent signing and verification for Dify workflows.
 
 ## What it does
 
-This plugin connects Dify workflows to the [asqav](https://asqav.com) API, adding ML-DSA-65 post-quantum cryptographic signing to agent actions. Every signed action creates a tamper-evident audit record that anyone can verify.
+This plugin connects Dify workflows to the [Asqav](https://asqav.com) API, adding ML-DSA-65 post-quantum cryptographic signing to agent actions. Every signed action creates an audit record that anyone can verify.
 
 ## Data handling
 
