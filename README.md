@@ -22,7 +22,7 @@ import asqav
 asqav.init(api_key="sk_...", base_url="https://api.asqav.com", mode="hash-only")
 ```
 
-The plugin inherits the SDK's `mode` behavior whenever it is invoked through the SDK rather than directly. See `docs/canonicalization.md` in the SDK repo for the canonicalization spec and conformance vectors.
+The plugin inherits the SDK's `mode` behavior whenever it is invoked through the SDK rather than directly. See [docs/fingerprint-spec.md](https://github.com/jagmarques/asqav-sdk/blob/main/docs/fingerprint-spec.md) in the SDK repo for the fingerprint spec and conformance vectors.
 
 ## Tools
 
