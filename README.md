@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://asqav.com"><img src="https://asqav.com/logo-text-white.png" alt="asqav" width="150"></a>
+  <a href="https://asqav.com"><img src="https://asqav.com/logo-text-white.png" alt="Asqav" width="150"></a>
 </p>
 
 # Asqav Dify Plugin
