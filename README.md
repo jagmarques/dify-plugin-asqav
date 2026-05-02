@@ -2,7 +2,7 @@
   <a href="https://asqav.com"><img src="https://asqav.com/logo-text-white.png" alt="asqav" width="150"></a>
 </p>
 
-# asqav Dify Plugin
+# Asqav Dify Plugin
 
 Post-quantum agent signing and verification for Dify workflows.
 
@@ -38,7 +38,7 @@ Creates a multi-party signing session for high-risk actions. The action must be 
 ## Setup
 
 1. Get an API key at [asqav.com](https://asqav.com)
-2. Create an agent via the asqav dashboard or SDK
+2. Create an agent via the Asqav dashboard or SDK
 3. Enter your API key and Agent ID in the plugin credentials
 
 ## Credentials
