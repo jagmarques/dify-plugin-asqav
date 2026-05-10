@@ -6,9 +6,9 @@ identity:
     zh_Hans: asqav
     pt_BR: asqav
   description:
-    en_US: Post-quantum agent signing and verification. Sign agent actions with ML-DSA-65 via asqav.com.
-    zh_Hans: Post-quantum agent signing and verification. Sign agent actions with ML-DSA-65 via asqav.com.
-    pt_BR: Post-quantum agent signing and verification. Sign agent actions with ML-DSA-65 via asqav.com.
+    en_US: AI agent governance, audit trails, and compliance. Sign agent actions with ML-DSA-65 via asqav.com.
+    zh_Hans: AI agent governance, audit trails, and compliance. Sign agent actions with ML-DSA-65 via asqav.com.
+    pt_BR: AI agent governance, audit trails, and compliance. Sign agent actions with ML-DSA-65 via asqav.com.
   icon: icon.svg
   tags:
     - utilities

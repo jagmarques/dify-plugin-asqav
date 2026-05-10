@@ -4,11 +4,11 @@
 
 # Asqav Dify Plugin
 
-Post-quantum agent signing and verification for Dify workflows.
+AI agent governance for Dify workflows. Audit trails, policy enforcement, and compliance.
 
 ## What it does
 
-This plugin connects Dify workflows to the [Asqav](https://asqav.com) API, adding ML-DSA-65 post-quantum cryptographic signing to agent actions. Every signed action creates an audit record that anyone can verify.
+This plugin connects Dify workflows to the [Asqav](https://asqav.com) API, adding ML-DSA-65 cryptographic signing to agent actions for governance and compliance. Every signed action creates an audit record that anyone can verify.
 
 ## Data handling
 
@@ -43,15 +43,15 @@ Creates a multi-party signing session for high-risk actions. The action must be 
 
 ## Credentials
 
-- **asqav API Key**: Your API key from asqav.com (starts with `sk_`)
+- **Asqav API Key**: Your API key from asqav.com (starts with `sk_`)
 - **Agent ID**: The agent to use for signing (starts with `agent_`)
 
 ## Links
 
-- [asqav documentation](https://asqav.com/docs)
-- [asqav SDK on PyPI](https://pypi.org/project/asqav/)
+- [Asqav documentation](https://asqav.com/docs)
+- [Asqav SDK on PyPI](https://pypi.org/project/asqav/)
 - [Source code](https://github.com/jagmarques/dify-plugin-asqav)
 
 ## Contact
 
-Author: asqav (https://asqav.com)
+Author: Asqav (https://asqav.com)
