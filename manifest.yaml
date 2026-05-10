@@ -7,9 +7,9 @@ label:
   zh_Hans: asqav
   pt_BR: asqav
 description:
-  en_US: Post-quantum agent signing and verification via asqav.com. Sign agent actions with ML-DSA-65, verify signatures, and request multi-party authorized actions.
-  zh_Hans: Post-quantum agent signing and verification via asqav.com. Sign agent actions with ML-DSA-65, verify signatures, and request multi-party authorized actions.
-  pt_BR: Post-quantum agent signing and verification via asqav.com. Sign agent actions with ML-DSA-65, verify signatures, and request multi-party authorized actions.
+  en_US: AI agent governance via asqav.com. Audit trails, policy enforcement, and compliance. Sign agent actions, verify signatures, and request multi-party authorized actions.
+  zh_Hans: AI agent governance via asqav.com. Audit trails, policy enforcement, and compliance. Sign agent actions, verify signatures, and request multi-party authorized actions.
+  pt_BR: AI agent governance via asqav.com. Audit trails, policy enforcement, and compliance. Sign agent actions, verify signatures, and request multi-party authorized actions.
 icon: icon.svg
 resource:
   memory: 268435456
