@@ -21,5 +21,5 @@ All cryptographic operations are performed server-side by the asqav API. The asq
 
 ### Contact
 
-For privacy inquiries, contact: privacy@asqav.com
+For privacy inquiries, contact: info@asqav.com
 Repository: https://github.com/jagmarques/dify-plugin-asqav
