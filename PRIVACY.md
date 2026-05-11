@@ -2,11 +2,11 @@
 
 ### Data Collection
 
-This plugin sends the following data to the asqav API (api.asqav.com):
+This plugin sends the following data to the Asqav API (api.asqav.com):
 
 - **Action type**: A string label describing the agent action being signed (e.g., "read:data").
 - **Context payload**: A JSON object with metadata about the action. This is user-provided and may contain any data the user chooses to include.
-- **Agent ID**: The identifier of the asqav agent performing the signing.
+- **Agent ID**: The identifier of the Asqav agent performing the signing.
 - **Signature ID**: Used for verification lookups (public endpoint, no authentication required).
 
 ### Data Not Collected
@@ -17,7 +17,7 @@ This plugin sends the following data to the asqav API (api.asqav.com):
 
 ### Third-Party Service
 
-All cryptographic operations are performed server-side by the asqav API. The asqav API key is transmitted as an HTTP header for authentication. See https://asqav.com/privacy for the full asqav privacy policy.
+All cryptographic operations are performed server-side by the Asqav API. The Asqav API key is transmitted as an HTTP header for authentication. See https://asqav.com/privacy for the full Asqav privacy policy.
 
 ### Contact
 
