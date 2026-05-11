@@ -12,7 +12,7 @@ class AsqavProvider(ToolProvider):
         agent_id = credentials.get("asqav_agent_id", "")
 
         if not api_key:
-            raise ToolProviderCredentialValidationError("asqav API key is required")
+            raise ToolProviderCredentialValidationError("Asqav API key is required")
         if not agent_id:
             raise ToolProviderCredentialValidationError("Agent ID is required")
 
