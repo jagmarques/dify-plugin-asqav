@@ -31,5 +31,5 @@ class AsqavProvider(ToolProvider):
             raise
         except Exception as e:
             raise ToolProviderCredentialValidationError(
-                f"Failed to validate credentials: {str(e)}"
-            )
+                f"Failed to validate credentials: {e!s}"
+            ) from e
