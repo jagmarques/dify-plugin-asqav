@@ -46,6 +46,22 @@ Creates a multi-party signing session for high-risk actions. The action must be 
 - **Asqav API Key**: Your API key from asqav.com (starts with `sk_`)
 - **Agent ID**: The agent to use for signing (starts with `agent_`)
 
+## Development
+
+Run the smoke test suite locally:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt -r requirements-dev.txt
+pytest -v
+```
+
+The suite covers the provider entrypoint and each tool. Network calls to the
+Asqav API are mocked, so the tests run offline. CI runs the same suite on
+Python 3.12 (matching the plugin runner version in `manifest.yaml`) for every
+PR and push to `main`.
+
 ## Links
 
 - [Asqav documentation](https://asqav.com/docs)
