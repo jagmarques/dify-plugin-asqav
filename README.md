@@ -59,7 +59,8 @@ pytest -v
 
 The suite covers the provider entrypoint and each tool. Network calls to the
 Asqav API are mocked, so the tests run offline. CI runs the same suite on
-Python 3.11 and 3.12 for every PR and push to `main`.
+Python 3.12 (matching the plugin runner version in `manifest.yaml`) for every
+PR and push to `main`.
 
 ## Links
 

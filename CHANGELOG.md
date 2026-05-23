@@ -9,8 +9,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 ### Added
 - pytest smoke suite covering the provider entrypoint and all three tools, with
   network calls mocked so the suite runs offline.
-- GitHub Actions CI (`.github/workflows/ci.yml`) running pytest on Python 3.11
-  and 3.12 for every PR and push to `main`.
+- GitHub Actions CI (`.github/workflows/ci.yml`) running pytest on Python 3.12
+  (matching the plugin runner declared in `manifest.yaml`) for every PR and
+  push to `main`.
 - `requirements-dev.txt` listing the test dependencies, plus a Development
   section in the README explaining how to run the suite locally.
 

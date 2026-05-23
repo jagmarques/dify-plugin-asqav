@@ -13,7 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
+        # Matches the Python version declared in manifest.yaml's runner block.
+        python-version: ["3.12"]
     steps:
       - uses: actions/checkout@v4
 
