@@ -24,11 +24,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
   push to `main`.
 - `requirements-dev.txt` listing the test dependencies, plus a Development
   section in the README explaining how to run the suite locally.
+- `output_schema` declarations on all three tools (`sign_action`,
+  `verify_signature`, `request_action`) so downstream workflow nodes can
+  address each returned field by name.
 
 ### Changed
 - Plugin user-facing text is now English-only (`en_US`). Removed the
   untranslated `zh_Hans` and `pt_BR` locale keys that duplicated the English
   strings across the manifest, provider, and tool definitions.
+- README now documents the full output of each tool, including the structured
+  `authorized` decision and `signature_b64` from `sign_action`.
+
+### Fixed
+- The `sign_action` `timestamp` output is a Unix epoch number, not an ISO 8601
+  string; corrected its type and description in the tool schema.
+- Capitalised the display label and credential prose to "Asqav" across the
+  manifest, provider, and tool definitions.
 
 ## [0.0.2] - 2026-05-11
 

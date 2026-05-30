@@ -3,7 +3,7 @@ type: plugin
 author: asqav
 name: asqav
 label:
-  en_US: asqav
+  en_US: Asqav
 description:
   en_US: AI agent governance via asqav.com. Audit trails, policy enforcement, and compliance. Sign agent actions, verify signatures, and request multi-party authorized actions.
 icon: icon.svg
