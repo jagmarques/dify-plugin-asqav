@@ -5,7 +5,7 @@ identity:
     en_US: Request Action
 description:
   human:
-    en_US: Request a multi-party authorized action. Creates a signing session that requires entity approvals before the action is authorized. Use this as a pre-execution gate for high-risk actions.
+    en_US: Request a multi-party authorized action. Creates a signing session that requires approvals before the action is authorized. Use as a pre-execution gate for high-risk actions.
   llm: Request a multi-party authorized action for an agent. Creates a signing session that requires multiple entity approvals. Returns the session ID, status, required approvals count, and current signatures collected. Use this as a gate before executing high-risk actions.
 parameters:
   - name: action_type

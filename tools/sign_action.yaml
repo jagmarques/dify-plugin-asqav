@@ -5,7 +5,7 @@ identity:
     en_US: Sign Action
 description:
   human:
-    en_US: Sign an agent action with ML-DSA-65. Creates a tamper-evident audit record via asqav.com for AI agent governance and compliance. Returns authorized=true with the signature ID and verification URL when the action is permitted, or authorized=false with a reason when a policy, an emergency halt, or a delegation limit blocks it.
+    en_US: Cryptographically sign an agent action with ML-DSA-65, creating an independently verifiable entry in the Asqav audit trail. Returns the signature ID and verification URL.
   llm: Sign an agent action with ML-DSA-65 for AI agent governance and compliance. Provide an action_type string (e.g. "read:data", "api:call", "tool:execute") and optional context as a JSON string. Returns a JSON object with an "authorized" boolean. When true, it includes signature_id, action_id, timestamp, verification_url, and signature_b64. When false, it includes a "reason" (policy_blocked, emergency_halt, delegation_denied, quarantine, or denied) and a human-readable "detail" so the workflow can branch instead of failing.
 parameters:
   - name: action_type

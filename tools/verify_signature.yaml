@@ -5,7 +5,7 @@ identity:
     en_US: Verify Signature
 description:
   human:
-    en_US: Verify an Asqav signature by its ID. This is a public endpoint that requires no authentication. Returns whether the signature is valid, the agent that created it, and the action details.
+    en_US: Verify an Asqav signature by its ID. This is a public check that needs no API key. Returns whether the signature is valid, the signing agent, and the action details.
   llm: Verify an Asqav signature by its signature ID. Returns verification status, the signing agent name/ID, the action type, and the timestamp. No authentication needed.
 parameters:
   - name: signature_id
