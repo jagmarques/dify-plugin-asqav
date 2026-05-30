@@ -3,26 +3,18 @@ identity:
   author: asqav
   label:
     en_US: Sign Action
-    zh_Hans: Sign Action
-    pt_BR: Sign Action
 description:
   human:
-    en_US: Sign an agent action with ML-DSA-65. Creates a tamper-evident audit record via asqav.com for AI agent governance and compliance. Returns the signature ID and verification URL.
-    zh_Hans: Sign an agent action with ML-DSA-65. Creates a tamper-evident audit record via asqav.com for AI agent governance and compliance. Returns the signature ID and verification URL.
-    pt_BR: Sign an agent action with ML-DSA-65. Creates a tamper-evident audit record via asqav.com for AI agent governance and compliance. Returns the signature ID and verification URL.
-  llm: Sign an agent action with ML-DSA-65 for AI agent governance and compliance. Provide an action_type string (e.g. "read:data", "api:call", "tool:execute") and optional context as a JSON string. Returns the signature ID, action ID, timestamp, and a public verification URL.
+    en_US: Sign an agent action with ML-DSA-65. Creates a tamper-evident audit record via asqav.com for AI agent governance and compliance. Returns authorized=true with the signature ID and verification URL when the action is permitted, or authorized=false with a reason when a policy, an emergency halt, or a delegation limit blocks it.
+  llm: Sign an agent action with ML-DSA-65 for AI agent governance and compliance. Provide an action_type string (e.g. "read:data", "api:call", "tool:execute") and optional context as a JSON string. Returns a JSON object with an "authorized" boolean. When true, it includes signature_id, action_id, timestamp, verification_url, and signature_b64. When false, it includes a "reason" (policy_blocked, emergency_halt, delegation_denied, quarantine, or denied) and a human-readable "detail" so the workflow can branch instead of failing.
 parameters:
   - name: action_type
     type: string
     required: true
     label:
       en_US: Action Type
-      zh_Hans: Action Type
-      pt_BR: Action Type
     human_description:
       en_US: Type of action being signed, e.g. "read:data", "api:call", "tool:execute"
-      zh_Hans: Type of action being signed, e.g. "read:data", "api:call", "tool:execute"
-      pt_BR: Type of action being signed, e.g. "read:data", "api:call", "tool:execute"
     llm_description: The action type string that identifies the kind of action being signed. Examples - "read:data", "api:call", "tool:execute", "deploy:production".
     form: llm
   - name: context
@@ -30,12 +22,8 @@ parameters:
     required: false
     label:
       en_US: Context (JSON)
-      zh_Hans: Context (JSON)
-      pt_BR: Context (JSON)
     human_description:
       en_US: Optional JSON string with additional context for the action
-      zh_Hans: Optional JSON string with additional context for the action
-      pt_BR: Optional JSON string with additional context for the action
     llm_description: Optional JSON string with metadata about the action. Example - {"file":"config.json","user":"admin"}
     form: llm
 extra:
