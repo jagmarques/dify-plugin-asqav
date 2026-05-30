@@ -6,6 +6,8 @@ import httpx
 from dify_plugin import Tool
 from dify_plugin.entities.tool import ToolInvokeMessage
 
+from tools._outputs import emit
+
 API_BASE = "https://api.asqav.com/api/v1"
 
 
@@ -20,7 +22,7 @@ class VerifySignatureTool(Tool):
         response.raise_for_status()
         data = response.json()
 
-        yield self.create_json_message({
+        yield from emit(self, {
             "verified": data["verified"],
             "signature_id": data["signature_id"],
             "agent_id": data["agent_id"],

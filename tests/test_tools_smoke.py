@@ -31,6 +31,17 @@ def _make_tool(tool_cls, credentials: dict[str, Any]):
     return tool
 
 
+def _json_and_var_names(messages):
+    """Split tool output into its single JSON message and the variable names emitted."""
+    json_msgs = [m for m in messages if m.type == ToolInvokeMessage.MessageType.JSON]
+    var_names = {
+        m.message.variable_name
+        for m in messages
+        if m.type == ToolInvokeMessage.MessageType.VARIABLE
+    }
+    return json_msgs, var_names
+
+
 @pytest.fixture
 def credentials() -> dict[str, Any]:
     return {
@@ -77,7 +88,9 @@ def test_sign_action_posts_expected_body(
     assert kwargs["json"]["action_type"] == "tool:execute"
     assert kwargs["json"]["context"] == {"foo": "bar"}
 
-    assert len(messages) == 1
+    json_msgs, var_names = _json_and_var_names(messages)
+    assert len(json_msgs) == 1
+    assert {"authorized", "signature_id", "verification_url"} <= var_names
 
 
 def test_sign_action_treats_invalid_json_context_as_raw(
@@ -132,7 +145,9 @@ def test_verify_signature_calls_public_endpoint(
     fake_get.assert_called_once()
     args, _ = fake_get.call_args
     assert args[0].endswith("/verify/sig_123")
-    assert len(messages) == 1
+    json_msgs, var_names = _json_and_var_names(messages)
+    assert len(json_msgs) == 1
+    assert {"verified", "signature_id", "algorithm"} <= var_names
 
 
 def test_request_action_builds_signing_session_body(
@@ -167,7 +182,9 @@ def test_request_action_builds_signing_session_body(
     assert kwargs["json"]["agent_id"] == credentials["asqav_agent_id"]
     assert kwargs["json"]["action_type"] == "transfer:funds"
     assert kwargs["json"]["params"] == {"amount": 100}
-    assert len(messages) == 1
+    json_msgs, var_names = _json_and_var_names(messages)
+    assert len(json_msgs) == 1
+    assert {"session_id", "status", "approvals_required"} <= var_names
 
 
 def test_sign_action_surfaces_403_without_raising(
@@ -187,7 +204,9 @@ def test_sign_action_surfaces_403_without_raising(
     tool = _make_tool(SignActionTool, credentials)
     messages = list(tool._invoke({"action_type": "refund:approve", "context": ""}))
 
-    assert len(messages) == 1
+    json_msgs, var_names = _json_and_var_names(messages)
+    assert len(json_msgs) == 1
+    assert {"authorized", "reason"} <= var_names
 
 
 @pytest.mark.parametrize(

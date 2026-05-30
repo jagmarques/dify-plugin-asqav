@@ -7,6 +7,8 @@ import httpx
 from dify_plugin import Tool
 from dify_plugin.entities.tool import ToolInvokeMessage
 
+from tools._outputs import emit
+
 API_BASE = "https://api.asqav.com/api/v1"
 
 #: Substring of a string-form 403 detail -> stable machine reason (halt/delegation/quarantine).
@@ -44,13 +46,13 @@ class SignActionTool(Tool):
 
         # A 403 is a policy decision the workflow can branch on; other non-2xx stays loud below.
         if response.status_code == 403:
-            yield self.create_json_message(_denied_result(response))
+            yield from emit(self, _denied_result(response))
             return
 
         response.raise_for_status()
         data = response.json()
 
-        yield self.create_json_message({
+        yield from emit(self, {
             "authorized": True,
             "signature_id": data["signature_id"],
             "action_id": data["action_id"],

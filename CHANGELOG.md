@@ -36,6 +36,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
   `authorized` decision and `signature_b64` from `sign_action`.
 
 ### Fixed
+- Each tool now emits its result as individual workflow variables in addition
+  to the JSON message, so a Dify workflow node can address each field by name
+  (`signature_id`, `authorized`, `verified`, and so on) at runtime. A JSON
+  message alone left named selectors unresolved once wired in a workflow.
 - The `sign_action` `timestamp` output is a Unix epoch number, not an ISO 8601
   string; corrected its type and description in the tool schema.
 - Capitalised the display label and credential prose to "Asqav" across the
