@@ -8,3 +8,10 @@ venv/
 .git/
 .gitignore
 .DS_Store
+.venv-test/
+tests/
+.github/
+.pytest_cache/
+.ruff_cache/
+.claude/
+requirements-dev.txt

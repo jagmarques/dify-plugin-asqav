@@ -20,3 +20,30 @@ parameters:
 extra:
   python:
     source: tools/verify_signature.py
+output_schema:
+  type: object
+  properties:
+    verified:
+      type: boolean
+      description: True if the signature is valid.
+    signature_id:
+      type: string
+      description: The verified signature ID.
+    agent_id:
+      type: string
+      description: ID of the agent that produced the signature.
+    agent_name:
+      type: string
+      description: Display name of the signing agent.
+    action_type:
+      type: string
+      description: The action type that was signed.
+    algorithm:
+      type: string
+      description: Signature algorithm, e.g. ML-DSA-65.
+    signed_at:
+      type: string
+      description: ISO 8601 timestamp of when the action was signed.
+    verification_url:
+      type: string
+      description: Public URL to verify the signature.

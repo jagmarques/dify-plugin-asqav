@@ -29,3 +29,27 @@ parameters:
 extra:
   python:
     source: tools/request_action.py
+output_schema:
+  type: object
+  properties:
+    session_id:
+      type: string
+      description: ID of the multi-party signing session.
+    status:
+      type: string
+      description: Current session status, e.g. pending, approved, or expired.
+    approvals_required:
+      type: number
+      description: Number of entity approvals required before authorization.
+    signatures_collected:
+      type: number
+      description: Number of approvals collected so far.
+    action_type:
+      type: string
+      description: The action type requiring authorization.
+    created_at:
+      type: string
+      description: ISO 8601 timestamp when the session was created.
+    expires_at:
+      type: string
+      description: ISO 8601 timestamp when the session expires.
