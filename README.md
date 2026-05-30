@@ -27,13 +27,18 @@ The plugin inherits the SDK's `mode` behavior whenever it is invoked through the
 ## Tools
 
 ### Sign Action
-Signs an agent action with ML-DSA-65. Provide an action type (e.g. "read:data", "tool:execute") and optional context. Returns a signature ID and public verification URL.
+Signs an agent action with ML-DSA-65. Provide an action type (e.g. "read:data", "tool:execute") and optional context JSON.
+
+Returns a JSON object with an `authorized` boolean so a workflow can branch on the decision instead of failing:
+
+- When the action is permitted, `authorized` is `true` and the result includes `signature_id`, `action_id`, `timestamp`, `verification_url`, and the base64 ML-DSA-65 signature in `signature_b64`.
+- When the action is blocked, `authorized` is `false` and the result includes a machine `reason` (`policy_blocked`, `emergency_halt`, `delegation_denied`, `quarantine`, or `denied`) plus a human-readable `detail`. A policy block also returns `attestation_hash` and a `signed_deny` envelope, which is itself a verifiable signed denial receipt.
 
 ### Verify Signature
-Verifies a signature by its ID. This is a public endpoint - no authentication needed. Returns the verification status, signing agent, action details, and timestamp.
+Verifies a signature by its ID. This is a public endpoint - no authentication needed. Returns `verified`, the signing `agent_id` and `agent_name`, the `action_type`, the `algorithm` (e.g. ML-DSA-65), the `signed_at` timestamp, and the `verification_url`.
 
 ### Request Action
-Creates a multi-party signing session for high-risk actions. The action must be approved by enough signing entities before it is authorized. Use this as a pre-execution gate in workflows.
+Creates a multi-party signing session for high-risk actions. The action must be approved by enough signing entities before it is authorized. Use this as a pre-execution gate in workflows. Returns the `session_id`, `status`, `approvals_required`, `signatures_collected`, `action_type`, `created_at`, and `expires_at`.
 
 ## Setup
 

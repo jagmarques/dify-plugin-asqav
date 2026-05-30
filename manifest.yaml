@@ -1,15 +1,11 @@
-version: 0.0.2
+version: 0.0.3
 type: plugin
 author: asqav
 name: asqav
 label:
-  en_US: asqav
-  zh_Hans: asqav
-  pt_BR: asqav
+  en_US: Asqav
 description:
   en_US: AI agent governance via asqav.com. Audit trails, policy enforcement, and compliance. Sign agent actions, verify signatures, and request multi-party authorized actions.
-  zh_Hans: AI agent governance via asqav.com. Audit trails, policy enforcement, and compliance. Sign agent actions, verify signatures, and request multi-party authorized actions.
-  pt_BR: AI agent governance via asqav.com. Audit trails, policy enforcement, and compliance. Sign agent actions, verify signatures, and request multi-party authorized actions.
 icon: icon.svg
 resource:
   memory: 268435456
@@ -23,7 +19,7 @@ plugins:
   tools:
     - provider/asqav.yaml
 meta:
-  version: 0.0.2
+  version: 0.0.3
   arch:
     - amd64
     - arm64

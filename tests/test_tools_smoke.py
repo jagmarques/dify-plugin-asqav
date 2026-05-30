@@ -14,7 +14,7 @@ import pytest
 from dify_plugin.entities.tool import ToolInvokeMessage, ToolRuntime
 
 from tools.request_action import RequestActionTool
-from tools.sign_action import SignActionTool
+from tools.sign_action import SignActionTool, _denied_result
 from tools.verify_signature import VerifySignatureTool
 
 
@@ -29,6 +29,17 @@ def _make_tool(tool_cls, credentials: dict[str, Any]):
     tool.session = None
     tool.response_type = ToolInvokeMessage
     return tool
+
+
+def _json_and_var_names(messages):
+    """Split tool output into its single JSON message and the variable names emitted."""
+    json_msgs = [m for m in messages if m.type == ToolInvokeMessage.MessageType.JSON]
+    var_names = {
+        m.message.variable_name
+        for m in messages
+        if m.type == ToolInvokeMessage.MessageType.VARIABLE
+    }
+    return json_msgs, var_names
 
 
 @pytest.fixture
@@ -77,7 +88,9 @@ def test_sign_action_posts_expected_body(
     assert kwargs["json"]["action_type"] == "tool:execute"
     assert kwargs["json"]["context"] == {"foo": "bar"}
 
-    assert len(messages) == 1
+    json_msgs, var_names = _json_and_var_names(messages)
+    assert len(json_msgs) == 1
+    assert {"authorized", "signature_id", "verification_url"} <= var_names
 
 
 def test_sign_action_treats_invalid_json_context_as_raw(
@@ -132,7 +145,9 @@ def test_verify_signature_calls_public_endpoint(
     fake_get.assert_called_once()
     args, _ = fake_get.call_args
     assert args[0].endswith("/verify/sig_123")
-    assert len(messages) == 1
+    json_msgs, var_names = _json_and_var_names(messages)
+    assert len(json_msgs) == 1
+    assert {"verified", "signature_id", "algorithm"} <= var_names
 
 
 def test_request_action_builds_signing_session_body(
@@ -167,4 +182,65 @@ def test_request_action_builds_signing_session_body(
     assert kwargs["json"]["agent_id"] == credentials["asqav_agent_id"]
     assert kwargs["json"]["action_type"] == "transfer:funds"
     assert kwargs["json"]["params"] == {"amount": 100}
-    assert len(messages) == 1
+    json_msgs, var_names = _json_and_var_names(messages)
+    assert len(json_msgs) == 1
+    assert {"session_id", "status", "approvals_required"} <= var_names
+
+
+def test_sign_action_surfaces_403_without_raising(
+    mocker, credentials: dict[str, Any], fake_response_factory
+) -> None:
+    """A 403 policy decision is yielded as one structured message, never raised."""
+    mocker.patch(
+        "tools.sign_action.httpx.post",
+        return_value=fake_response_factory(
+            status_code=403,
+            json_data={
+                "detail": "Organization is under emergency halt; signing is disabled"
+            },
+        ),
+    )
+
+    tool = _make_tool(SignActionTool, credentials)
+    messages = list(tool._invoke({"action_type": "refund:approve", "context": ""}))
+
+    json_msgs, var_names = _json_and_var_names(messages)
+    assert len(json_msgs) == 1
+    assert {"authorized", "reason"} <= var_names
+
+
+@pytest.mark.parametrize(
+    ("detail", "expected_reason"),
+    [
+        ("Organization is under emergency halt; signing is disabled", "emergency_halt"),
+        ("Action type is outside the agent's delegated scope", "delegation_denied"),
+        ("Agent's delegation has expired", "delegation_denied"),
+        ("Agent is in quarantine mode (read/verify only, signing disabled)", "quarantine"),
+        ("Some unmapped refusal text", "denied"),
+    ],
+)
+def test_denied_result_maps_string_details(
+    detail: str, expected_reason: str, fake_response_factory
+) -> None:
+    """String-form 403 details map to a stable machine reason."""
+    result = _denied_result(fake_response_factory(status_code=403, json_data={"detail": detail}))
+
+    assert result["authorized"] is False
+    assert result["reason"] == expected_reason
+    assert result["detail"] == detail
+    assert result["signed_deny"] is None
+
+
+def test_denied_result_passes_through_signed_deny_envelope(fake_response_factory) -> None:
+    """A policy/content block returns policy_blocked with its signed denial receipt."""
+    detail = {
+        "error": "action_denied",
+        "attestation_hash": "abc123",
+        "signed_deny": {"body": {}, "signature_b64": "ZmFrZQ==", "algorithm": "ML-DSA-65"},
+    }
+    result = _denied_result(fake_response_factory(status_code=403, json_data={"detail": detail}))
+
+    assert result["authorized"] is False
+    assert result["reason"] == "policy_blocked"
+    assert result["attestation_hash"] == "abc123"
+    assert result["signed_deny"]["signature_b64"] == "ZmFrZQ=="

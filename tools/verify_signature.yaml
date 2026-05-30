@@ -3,28 +3,47 @@ identity:
   author: asqav
   label:
     en_US: Verify Signature
-    zh_Hans: Verify Signature
-    pt_BR: Verify Signature
 description:
   human:
-    en_US: Verify an asqav signature by its ID. This is a public endpoint that requires no authentication. Returns whether the signature is valid, the agent that created it, and the action details.
-    zh_Hans: Verify an asqav signature by its ID. This is a public endpoint that requires no authentication. Returns whether the signature is valid, the agent that created it, and the action details.
-    pt_BR: Verify an asqav signature by its ID. This is a public endpoint that requires no authentication. Returns whether the signature is valid, the agent that created it, and the action details.
-  llm: Verify an asqav signature by its signature ID. Returns verification status, the signing agent name/ID, the action type, and the timestamp. No authentication needed.
+    en_US: Verify an Asqav signature by its ID. This is a public endpoint that requires no authentication. Returns whether the signature is valid, the agent that created it, and the action details.
+  llm: Verify an Asqav signature by its signature ID. Returns verification status, the signing agent name/ID, the action type, and the timestamp. No authentication needed.
 parameters:
   - name: signature_id
     type: string
     required: true
     label:
       en_US: Signature ID
-      zh_Hans: Signature ID
-      pt_BR: Signature ID
     human_description:
       en_US: The signature ID to verify (e.g. sig_abc123)
-      zh_Hans: The signature ID to verify (e.g. sig_abc123)
-      pt_BR: The signature ID to verify (e.g. sig_abc123)
-    llm_description: The asqav signature ID to verify. Usually starts with "sig_".
+    llm_description: The Asqav signature ID to verify. Usually starts with "sig_".
     form: llm
 extra:
   python:
     source: tools/verify_signature.py
+output_schema:
+  type: object
+  properties:
+    verified:
+      type: boolean
+      description: True if the signature is valid.
+    signature_id:
+      type: string
+      description: The verified signature ID.
+    agent_id:
+      type: string
+      description: ID of the agent that produced the signature.
+    agent_name:
+      type: string
+      description: Display name of the signing agent.
+    action_type:
+      type: string
+      description: The action type that was signed.
+    algorithm:
+      type: string
+      description: Signature algorithm, e.g. ML-DSA-65.
+    signed_at:
+      type: string
+      description: ISO 8601 timestamp of when the action was signed.
+    verification_url:
+      type: string
+      description: Public URL to verify the signature.
