@@ -4,11 +4,11 @@
 
 # Asqav Dify Plugin
 
-AI agent governance for Dify workflows. Audit trails, policy enforcement, and compliance.
+Stop a rogue agent before it acts, and prove what it tried. For Dify workflows.
 
 ## What it does
 
-This plugin connects Dify workflows to the [Asqav](https://asqav.com) API, adding ML-DSA-65 cryptographic signing to agent actions for governance and compliance. Every signed action creates an audit record that anyone can verify.
+This plugin sends each agent action to the [Asqav](https://asqav.com) API before your workflow commits to it. Asqav checks the action against your policies: a blocked action comes back rejected with a forensic record of the attempt, and an allowed action proceeds and is signed with ML-DSA-65 into a verifiable audit trail. Either way you get tamper-evident evidence of what the agent tried.
 
 ## Data handling
 
