@@ -1,7 +1,3 @@
-<p align="center">
-  <a href="https://asqav.com"><img src="https://asqav.com/logo-text-white.png" alt="Asqav" width="150"></a>
-</p>
-
 # Asqav Dify Plugin
 
 Stop a rogue agent before it acts, and prove what it tried. For Dify workflows.
