@@ -1,74 +1,51 @@
 # Asqav Dify Plugin
 
-Stop a rogue agent before it acts, and prove what it tried. For Dify workflows.
+Asqav adds AI agent governance to your Dify workflows. It checks every agent action against your policies before it runs, blocks anything out of bounds, and cryptographically signs the rest into a tamper-evident audit trail you can verify later.
 
-## What it does
+## Overview
 
-This plugin sends each agent action to the [Asqav](https://asqav.com) API before your workflow commits to it. Asqav checks the action against your policies: a blocked action comes back rejected with a forensic record of the attempt, and an allowed action proceeds and is signed with ML-DSA-65 into a verifiable audit trail. Either way you get tamper-evident evidence of what the agent tried.
+Asqav is the evidence layer for AI agents. This plugin connects your Dify deployment to the Asqav API so that each action an agent takes is reviewed before your workflow commits to it. When an action is allowed, it is signed with ML-DSA-65 (a post-quantum signature) and recorded in a verifiable audit trail. When an action is blocked, you get a forensic record of the attempt instead. Either way, you end up with provable evidence of what your agents tried to do, which makes compliance reviews and incident investigations far easier.
 
-## Data handling
+The plugin calls the Asqav cloud API directly from your Dify deployment. Only a minimal metadata bag (action type, agent ID, session ID, model name, and tool name) is retained alongside a hash of the rest, in line with GDPR data minimization. If you prefer client-side hashing, you can run the Asqav Python SDK in hash-only mode alongside this plugin.
 
-This plugin calls the Asqav cloud API (`https://api.asqav.com`) directly from your Dify deployment. Action context (`action_type` and any `context` JSON you pass) is transmitted to the cloud where it is signed with ML-DSA-65. The cloud applies GDPR-aware data minimization: only the metadata bag (action_type, agent_id, session_id, model_name, tool_name) is retained alongside a hash of the rest where possible.
+## Configuration
 
-If you need client-side hash-only behavior, use the `asqav` Python SDK directly in your Dify workflow alongside this plugin:
+Setting up Asqav takes three short steps.
 
-```python
-import asqav
+**Get your API key.** Sign up at asqav.com and create an API key. It starts with `sk_`.
 
-asqav.init(api_key="sk_...", base_url="https://api.asqav.com", mode="hash-only")
-```
+**Create an agent.** Create an agent through the Asqav dashboard or SDK. Its ID starts with `agent_`.
 
-The plugin inherits the SDK's `mode` behavior whenever it is invoked through the SDK rather than directly. See [docs/fingerprint-spec.md](https://github.com/jagmarques/asqav-sdk/blob/main/docs/fingerprint-spec.md) in the SDK repo for the fingerprint spec and conformance vectors.
+**Authorize the plugin.** In Dify, go to Plugins, open Asqav, and enter your API key and Agent ID to enable the tool.
 
 ## Tools
 
+The Asqav plugin provides three actions for governing and proving agent activity.
+
 ### Sign Action
-Signs an agent action with ML-DSA-65. Provide an action type (e.g. "read:data", "tool:execute") and optional context JSON.
 
-Returns a JSON object with an `authorized` boolean so a workflow can branch on the decision instead of failing:
-
-- When the action is permitted, `authorized` is `true` and the result includes `signature_id`, `action_id`, `timestamp`, `verification_url`, and the base64 ML-DSA-65 signature in `signature_b64`.
-- When the action is blocked, `authorized` is `false` and the result includes a machine `reason` (`policy_blocked`, `emergency_halt`, `delegation_denied`, `quarantine`, or `denied`) plus a human-readable `detail`. A policy block also returns `attestation_hash` and a `signed_deny` envelope, which is itself a verifiable signed denial receipt.
+Signs an agent action with ML-DSA-65. You provide an action type, such as `read:data` or `tool:execute`, plus optional context. The response includes an `authorized` flag so your workflow can branch on the decision instead of failing. An allowed action returns its signature, identifiers, timestamp, and a public verification URL. A blocked action returns a clear reason along with a signed denial receipt that is itself verifiable.
 
 ### Verify Signature
-Verifies a signature by its ID. This is a public endpoint - no authentication needed. Returns `verified`, the signing `agent_id` and `agent_name`, the `action_type`, the `algorithm` (e.g. ML-DSA-65), the `signed_at` timestamp, and the `verification_url`.
+
+Verifies a signature by its ID. This is a public action that needs no authentication, so anyone can confirm that a given action was genuinely signed, who signed it, when, and with which algorithm.
 
 ### Request Action
-Creates a multi-party signing session for high-risk actions. The action must be approved by enough signing entities before it is authorized. Use this as a pre-execution gate in workflows. Returns the `session_id`, `status`, `approvals_required`, `signatures_collected`, `action_type`, `created_at`, and `expires_at`.
 
-## Setup
+Creates a multi-party signing session for high-risk actions. The action stays pending until enough approvers have signed off, which makes it a natural pre-execution gate for sensitive steps in a workflow.
 
-1. Get an API key at [asqav.com](https://asqav.com)
-2. Create an agent via the Asqav dashboard or SDK
-3. Enter your API key and Agent ID in the plugin credentials
+## Usage
 
-## Credentials
+Asqav fits into both Chatflow / Workflow apps and Agent apps.
 
-- **Asqav API Key**: Your API key from asqav.com (starts with `sk_`)
-- **Agent ID**: The agent to use for signing (starts with `agent_`)
+In a Chatflow or Workflow, add an Asqav node before the step you want to govern, choose the Sign Action or Request Action tool, and branch on the `authorized` result so the workflow only proceeds when the action is permitted.
 
-## Development
+In an Agent app, add the Asqav tool so the agent signs its actions as it works, building a verifiable record of everything it does without changing how the agent behaves.
 
-Run the smoke test suite locally:
+## Resources
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt -r requirements-dev.txt
-pytest -v
-```
-
-The suite covers the provider entrypoint and each tool. Network calls to the
-Asqav API are mocked, so the tests run offline. CI runs the same suite on
-Python 3.12 (matching the plugin runner version in `manifest.yaml`) for every
-PR and push to `main`.
-
-## Links
-
-- [Asqav documentation](https://asqav.com/docs)
-- [Asqav SDK on PyPI](https://pypi.org/project/asqav/)
-- [Source code](https://github.com/jagmarques/dify-plugin-asqav)
+Documentation is at [asqav.com/docs](https://asqav.com/docs), the Python SDK is on [PyPI](https://pypi.org/project/asqav/), and the plugin source lives on [GitHub](https://github.com/jagmarques/dify-plugin-asqav).
 
 ## Contact
 
-Author: Asqav (https://asqav.com)
+Built by Asqav. Learn more at [asqav.com](https://asqav.com).
