@@ -10,13 +10,11 @@ The plugin calls the Asqav cloud API directly from your Dify deployment. Only a 
 
 ## Configuration
 
-Setting up Asqav takes three short steps.
+Setting up Asqav takes three short steps:
 
-**Get your API key.** Sign up at asqav.com and create an API key. It starts with `sk_`.
-
-**Create an agent.** Create an agent through the Asqav dashboard or SDK. Its ID starts with `agent_`.
-
-**Authorize the plugin.** In Dify, go to Plugins, open Asqav, and enter your API key and Agent ID to enable the tool.
+- **Get your API key:** sign up at asqav.com and create an API key. It starts with `sk_`.
+- **Create an agent:** create an agent through the Asqav dashboard or SDK. Its ID starts with `agent_`.
+- **Authorize the plugin:** in Dify, go to Plugins, open Asqav, and enter your API key and Agent ID to enable the tool.
 
 ## Tools
 
@@ -36,15 +34,16 @@ Creates a multi-party signing session for high-risk actions. The action stays pe
 
 ## Usage
 
-Asqav fits into both Chatflow / Workflow apps and Agent apps.
+Asqav fits into both Chatflow / Workflow apps and Agent apps:
 
-In a Chatflow or Workflow, add an Asqav node before the step you want to govern, choose the Sign Action or Request Action tool, and branch on the `authorized` result so the workflow only proceeds when the action is permitted.
-
-In an Agent app, add the Asqav tool so the agent signs its actions as it works, building a verifiable record of everything it does without changing how the agent behaves.
+- **Chatflow or Workflow:** add an Asqav node before the step you want to govern, choose the Sign Action or Request Action tool, and branch on the `authorized` result so the workflow only proceeds when the action is permitted.
+- **Agent app:** add the Asqav tool so the agent signs its actions as it works, building a verifiable record of everything it does without changing how the agent behaves.
 
 ## Resources
 
-Documentation is at [asqav.com/docs](https://asqav.com/docs), the Python SDK is on [PyPI](https://pypi.org/project/asqav/), and the plugin source lives on [GitHub](https://github.com/jagmarques/dify-plugin-asqav).
+- **Documentation:** [asqav.com/docs](https://asqav.com/docs)
+- **Python SDK:** [PyPI](https://pypi.org/project/asqav/)
+- **Plugin source:** [GitHub](https://github.com/jagmarques/dify-plugin-asqav)
 
 ## Contact
 
