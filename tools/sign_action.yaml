@@ -6,7 +6,7 @@ identity:
 description:
   human:
     en_US: Cryptographically sign an agent action with ML-DSA-65, creating an independently verifiable entry in the Asqav audit trail. Returns the signature ID and verification URL.
-  llm: Sign an agent action with ML-DSA-65 for AI agent governance and compliance. Provide an action_type string (e.g. "read:data", "api:call", "tool:execute") and optional context as a JSON string. Returns a JSON object with an "authorized" boolean. When true, it includes signature_id, action_id, timestamp, verification_url, and signature_b64. When false, it includes a "reason" (policy_blocked, emergency_halt, delegation_denied, quarantine, or denied) and a human-readable "detail" so the workflow can branch instead of failing.
+  llm: Sign an agent action with ML-DSA-65 for AI agent governance and compliance. Provide an action_type string (e.g. "read:data", "api:call", "tool:execute") and optional context as a JSON string. Place this node at the boundary you want to govern: before an irreversible side effect to gate and sign it, or on the request before the agent runs. Returns a JSON object with an "authorized" boolean. When true, it includes signature_id, action_id, timestamp, verification_url, and signature_b64. When false, it includes a "reason" (policy_blocked, emergency_halt, delegation_denied, quarantine, or denied) and a human-readable "detail" so the workflow can branch instead of failing. To link a before-and-after pair of receipts for one action, pass the same action_ref to both.
 parameters:
   - name: action_type
     type: string
@@ -25,6 +25,15 @@ parameters:
     human_description:
       en_US: Optional JSON string with additional context for the action
     llm_description: Optional JSON string with metadata about the action. Example - {"file":"config.json","user":"admin"}
+    form: llm
+  - name: action_ref
+    type: string
+    required: false
+    label:
+      en_US: Action reference
+    human_description:
+      en_US: Optional shared reference to link two receipts for the same action, e.g. a permit sign before the action and an outcome sign after it.
+    llm_description: Optional shared reference string. Pass the same value to a sign placed before the side-effecting step and a sign placed after it to link the permit receipt and the outcome receipt for one action. It records that both receipts refer to the same action; it does not assert the action ran.
     form: llm
 extra:
   python:

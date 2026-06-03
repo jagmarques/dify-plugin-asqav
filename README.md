@@ -22,7 +22,7 @@ The Asqav plugin provides three actions for governing and proving agent activity
 
 ### Sign Action
 
-Signs an agent action with ML-DSA-65. You provide an action type, such as `read:data` or `tool:execute`, plus optional context. The response includes an `authorized` flag so your workflow can branch on the decision instead of failing. An allowed action returns its signature, identifiers, timestamp, and a public verification URL. A blocked action returns a clear reason along with a signed denial receipt that is itself verifiable.
+Signs an agent action with ML-DSA-65. You provide an action type, such as `read:data` or `tool:execute`, plus optional context. You can also pass an optional `action_ref` to label the action so a pair of receipts can be linked later. The response includes an `authorized` flag so your workflow can branch on the decision instead of failing. An allowed action returns its signature, identifiers, timestamp, and a public verification URL. A blocked action returns a clear reason along with a signed denial receipt that is itself verifiable.
 
 ### Verify Signature
 
@@ -36,7 +36,7 @@ Creates a multi-party signing session for high-risk actions. The action stays pe
 
 Asqav fits into both Chatflow / Workflow apps and Agent apps:
 
-- **Chatflow or Workflow:** add an Asqav node before the step you want to govern, choose the Sign Action or Request Action tool, and branch on the `authorized` result so the workflow only proceeds when the action is permitted.
+- **Chatflow or Workflow:** add an Asqav node before the step you want to govern, choose the Sign Action or Request Action tool, and branch on the `authorized` result so the workflow only proceeds when the action is permitted. To link a before-and-after pair of receipts for the same action, pass the same `action_ref` to both signs.
 - **Agent app:** add the Asqav tool so the agent signs its actions as it works, building a verifiable record of everything it does without changing how the agent behaves.
 
 ## Resources

@@ -26,6 +26,7 @@ class SignActionTool(Tool):
         agent_id = self.runtime.credentials["asqav_agent_id"]
         action_type = tool_parameters["action_type"]
         context_str = tool_parameters.get("context", "")
+        action_ref = tool_parameters.get("action_ref") or None
 
         context = {}
         if context_str:
@@ -34,13 +35,15 @@ class SignActionTool(Tool):
             except json.JSONDecodeError:
                 context = {"raw": context_str}
 
+        body: dict[str, Any] = {"action_type": action_type, "context": context}
+        # Same action_ref on a pre-action and a post-action sign links the two receipts.
+        if action_ref:
+            body["action_ref"] = action_ref
+
         response = httpx.post(
             f"{API_BASE}/agents/{agent_id}/sign",
             headers={"X-API-Key": api_key},
-            json={
-                "action_type": action_type,
-                "context": context,
-            },
+            json=body,
             timeout=30.0,
         )
 

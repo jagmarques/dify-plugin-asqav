@@ -6,6 +6,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ## [Unreleased]
 
+### Added
+- `sign_action` accepts an optional `action_ref`. Passing the same value to a
+  sign placed before a side-effecting step and a sign placed after it links the
+  permit receipt and the outcome receipt for one action. It records that both
+  receipts refer to the same action. It does not assert the action ran.
+
+### Changed
+- `sign_action` description now states where to place the node: at the boundary
+  you want to prove, before an irreversible side effect or on the request before
+  the agent runs.
+- README trimmed for the marketplace card. The tools are summarised up front and
+  the usage section explains boundary placement and the `action_ref` link.
+
 ## [0.0.3] - 2026-05-30
 
 ### Added
