@@ -4,7 +4,7 @@ Asqav adds AI agent governance to your Dify workflows. It checks every agent act
 
 ## Overview
 
-Asqav is the evidence layer for AI agents. This plugin connects your Dify deployment to the Asqav API so that each action an agent takes is reviewed before your workflow commits to it. When an action is allowed, it is signed with ML-DSA-65 (a post-quantum signature) and recorded in a verifiable audit trail. When an action is blocked, you get a forensic record of the attempt instead. Either way, you end up with provable evidence of what your agents tried to do, which makes compliance reviews and incident investigations far easier.
+Asqav is the evidence layer for AI agents. This plugin connects your Dify deployment to the Asqav API so each action an agent takes is reviewed before your workflow commits to it. An allowed action is signed with ML-DSA-65 (a post-quantum signature) and recorded in a verifiable audit trail. A blocked action leaves a forensic record of the attempt instead. Either way you keep provable evidence of what your agents tried to do, which makes compliance reviews and incident investigations far easier.
 
 The plugin calls the Asqav cloud API directly from your Dify deployment. Only a minimal metadata bag (action type, agent ID, session ID, model name, and tool name) is retained alongside a hash of the rest, in line with GDPR data minimization. If you prefer client-side hashing, you can run the Asqav Python SDK in hash-only mode alongside this plugin.
 
