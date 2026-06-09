@@ -93,6 +93,38 @@ def test_sign_action_posts_expected_body(
     assert {"authorized", "signature_id", "verification_url"} <= var_names
 
 
+def test_sign_action_passes_action_ref_when_given(
+    mocker, credentials: dict[str, Any], fake_response_factory
+) -> None:
+    """An action_ref is forwarded in the POST body so a before/after pair of
+    receipts can be linked; it is omitted from the body when not supplied."""
+    fake_post = mocker.patch(
+        "tools.sign_action.httpx.post",
+        return_value=fake_response_factory(
+            status_code=200,
+            json_data={
+                "signature_id": "sig_ref",
+                "action_id": "act_ref",
+                "timestamp": "2026-05-23T00:00:00Z",
+                "verification_url": "https://api.asqav.com/api/v1/verify/sig_ref",
+            },
+        ),
+    )
+
+    tool = _make_tool(SignActionTool, credentials)
+    list(
+        tool._invoke(
+            {"action_type": "payment:send", "action_ref": "loan-7421"}
+        )
+    )
+    _, kwargs = fake_post.call_args
+    assert kwargs["json"]["action_ref"] == "loan-7421"
+
+    list(tool._invoke({"action_type": "payment:send"}))
+    _, kwargs = fake_post.call_args
+    assert "action_ref" not in kwargs["json"]
+
+
 def test_sign_action_treats_invalid_json_context_as_raw(
     mocker, credentials: dict[str, Any], fake_response_factory
 ) -> None:
