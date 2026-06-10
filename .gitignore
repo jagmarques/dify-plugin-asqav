@@ -20,3 +20,5 @@ CLAUDE.md
 
 # Secrets
 .github_token
+# Local development files kept out of the published tree
+CHANGELOG.md
