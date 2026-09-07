@@ -6,6 +6,7 @@ import httpx
 from dify_plugin import Tool
 from dify_plugin.entities.tool import ToolInvokeMessage
 
+from tools._inputs import path_identifier
 from tools._outputs import emit
 
 API_BASE = "https://api.asqav.com/api/v1"
@@ -13,7 +14,7 @@ API_BASE = "https://api.asqav.com/api/v1"
 
 class VerifySignatureTool(Tool):
     def _invoke(self, tool_parameters: dict[str, Any]) -> Generator[ToolInvokeMessage]:
-        signature_id = tool_parameters["signature_id"]
+        signature_id = path_identifier(tool_parameters, "signature_id")
 
         response = httpx.get(
             f"{API_BASE}/verify/{signature_id}",

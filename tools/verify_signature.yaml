@@ -5,8 +5,8 @@ identity:
     en_US: Verify Signature
 description:
   human:
-    en_US: Verify an Asqav signature by its ID. This is a public check that needs no API key. Returns whether the signature is valid, the signing agent, and the action details.
-  llm: Verify an Asqav signature by its signature ID. Returns verification status, the signing agent name/ID, the action type, and the timestamp. No authentication needed.
+    en_US: Verify an Asqav signature by its ID. The Asqav verification request sends no API key; Dify provider setup still requires credentials. Returns whether the signature is valid, the signing agent, and the action details.
+  llm: Verify an Asqav signature by its signature ID. Returns verification status, the signing agent name/ID, the action type, and the timestamp. The outbound verification request sends no API key. Dify provider setup still requires credentials. This is a hosted check, not offline verification.
 parameters:
   - name: signature_id
     type: string
@@ -30,13 +30,13 @@ output_schema:
       type: string
       description: The verified signature ID.
     agent_id:
-      type: string
+      type: [string, "null"]
       description: ID of the agent that produced the signature.
     agent_name:
-      type: string
+      type: [string, "null"]
       description: Display name of the signing agent.
     action_type:
-      type: string
+      type: [string, "null"]
       description: The action type that was signed.
     algorithm:
       type: string

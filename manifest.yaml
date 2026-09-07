@@ -5,7 +5,7 @@ name: asqav
 label:
   en_US: Asqav
 description:
-  en_US: AI agent governance for Dify. Cryptographically sign agent actions into an audit trail, verify signatures, and require multi-party authorization for high-risk actions. Powered by Asqav.
+  en_US: Sign selected workflow actions, check signatures through the Asqav API, and create multi-party approval sessions.
 icon: icon.svg
 resource:
   memory: 268435456

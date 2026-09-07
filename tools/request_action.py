@@ -1,4 +1,3 @@
-import json
 from collections.abc import Generator
 from typing import Any
 
@@ -7,6 +6,7 @@ import httpx
 from dify_plugin import Tool
 from dify_plugin.entities.tool import ToolInvokeMessage
 
+from tools._inputs import object_parameter, path_identifier, required_text
 from tools._outputs import emit
 
 API_BASE = "https://api.asqav.com/api/v1"
@@ -14,20 +14,17 @@ API_BASE = "https://api.asqav.com/api/v1"
 
 class RequestActionTool(Tool):
     def _invoke(self, tool_parameters: dict[str, Any]) -> Generator[ToolInvokeMessage]:
-        api_key = self.runtime.credentials["asqav_api_key"]
-        agent_id = self.runtime.credentials["asqav_agent_id"]
-        action_type = tool_parameters["action_type"]
-        params_str = tool_parameters.get("params", "")
+        api_key = required_text(self.runtime.credentials, "asqav_api_key")
+        agent_id = path_identifier(self.runtime.credentials, "asqav_agent_id")
+        action_type = required_text(tool_parameters, "action_type")
+        params = object_parameter(tool_parameters, "params")
 
         body: dict[str, Any] = {
             "agent_id": agent_id,
             "action_type": action_type,
         }
-        if params_str:
-            try:
-                body["params"] = json.loads(params_str)
-            except json.JSONDecodeError:
-                body["params"] = {"raw": params_str}
+        if tool_parameters.get("params"):
+            body["params"] = params
 
         response = httpx.post(
             f"{API_BASE}/signing-groups/sessions",

@@ -4,7 +4,7 @@ identity:
   label:
     en_US: Asqav
   description:
-    en_US: AI agent governance and audit trails. Cryptographically sign agent actions and independently verify them. Powered by Asqav.
+    en_US: Sign selected actions, query hosted signature verification, and request approval sessions through Asqav.
   icon: icon.svg
   tags:
     - utilities
@@ -25,7 +25,7 @@ credentials_for_provider:
     label:
       en_US: Agent ID
     placeholder:
-      en_US: Your Asqav agent ID (agent_...)
+      en_US: Your Asqav agent ID (agt_...)
     help:
       en_US: The agent ID to use for signing actions
 tools:
