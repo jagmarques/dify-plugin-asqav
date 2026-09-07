@@ -5,8 +5,8 @@ identity:
     en_US: Request Action
 description:
   human:
-    en_US: Request a multi-party authorized action. Creates a signing session that requires approvals before the action is authorized. Use as a pre-execution gate for high-risk actions.
-  llm: Request a multi-party authorized action for an agent. Creates a signing session that requires multiple entity approvals. Returns the session ID, status, required approvals count, and current signatures collected. Use this as a gate before executing high-risk actions.
+    en_US: Create a pending approval session for an agent with an active signing group. Returns immediately; the workflow must check approval separately before executing.
+  llm: Request a multi-party authorized action for an agent. Creates a signing session that requires multiple entity approvals. Returns the session ID, status, required approvals count, and current signatures collected. Returns immediately without waiting, polling, or an authorized output. Check the session through the Asqav API and require approved status before executing. The agent needs an active signing group and an account with approval quorum access.
 parameters:
   - name: action_type
     type: string
@@ -23,8 +23,8 @@ parameters:
     label:
       en_US: Parameters (JSON)
     human_description:
-      en_US: Optional JSON string with parameters for the action
-    llm_description: Optional JSON string with parameters for the action. Example - {"target":"us-east-1","version":"2.0"}
+      en_US: Optional JSON object encoded as a string, sent in full to Asqav. Plain text is wrapped in a raw field
+    llm_description: Optional JSON object encoded as a string, sent in full to Asqav. Plain text is wrapped in a raw field. Example - {"target":"us-east-1","version":"2.0"}
     form: llm
 extra:
   python:

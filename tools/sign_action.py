@@ -1,4 +1,3 @@
-import json
 from collections.abc import Generator
 from typing import Any
 
@@ -7,6 +6,7 @@ import httpx
 from dify_plugin import Tool
 from dify_plugin.entities.tool import ToolInvokeMessage
 
+from tools._inputs import object_parameter, path_identifier, required_text
 from tools._outputs import emit
 
 API_BASE = "https://api.asqav.com/api/v1"
@@ -22,18 +22,13 @@ _STRING_REASONS: tuple[tuple[str, str], ...] = (
 
 class SignActionTool(Tool):
     def _invoke(self, tool_parameters: dict[str, Any]) -> Generator[ToolInvokeMessage]:
-        api_key = self.runtime.credentials["asqav_api_key"]
-        agent_id = self.runtime.credentials["asqav_agent_id"]
-        action_type = tool_parameters["action_type"]
-        context_str = tool_parameters.get("context", "")
-        action_ref = tool_parameters.get("action_ref") or None
-
-        context = {}
-        if context_str:
-            try:
-                context = json.loads(context_str)
-            except json.JSONDecodeError:
-                context = {"raw": context_str}
+        api_key = required_text(self.runtime.credentials, "asqav_api_key")
+        agent_id = path_identifier(self.runtime.credentials, "asqav_agent_id")
+        action_type = required_text(tool_parameters, "action_type")
+        context = object_parameter(tool_parameters, "context")
+        action_ref = tool_parameters.get("action_ref")
+        if action_ref is not None and action_ref != "":
+            action_ref = required_text(tool_parameters, "action_ref")
 
         body: dict[str, Any] = {"action_type": action_type, "context": context}
         # Same action_ref on a pre-action and a post-action sign links the two receipts.
@@ -71,9 +66,8 @@ def _denied_result(response: httpx.Response) -> dict[str, Any]:
     The Asqav cloud returns two ``detail`` shapes for a refused sign: a dict
     ``{"error", "attestation_hash", "signed_deny"}`` for a policy or content
     block, or a plain string for emergency halt, delegation, and quarantine
-    refusals. A policy block carries a signed denial receipt (``signed_deny``)
-    that is itself verifiable. Both shapes map to ``authorized=false``; the
-    caller never sees this when a signature was actually minted.
+    refusals. A policy block may carry a signed denial receipt (``signed_deny``).
+    Both shapes map to ``authorized=false``.
     """
     try:
         detail: Any = response.json().get("detail")
@@ -87,6 +81,7 @@ def _denied_result(response: httpx.Response) -> dict[str, Any]:
             "reason": "policy_blocked" if is_policy else "denied",
             "detail": detail.get("error", "action_denied"),
             "attestation_hash": detail.get("attestation_hash"),
+            "denial_signature_id": detail.get("denial_signature_id"),
             "signed_deny": detail.get("signed_deny"),
         }
 
@@ -102,5 +97,6 @@ def _denied_result(response: httpx.Response) -> dict[str, Any]:
         "reason": reason,
         "detail": text,
         "attestation_hash": None,
+        "denial_signature_id": None,
         "signed_deny": None,
     }

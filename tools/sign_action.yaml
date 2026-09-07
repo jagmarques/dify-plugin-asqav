@@ -23,8 +23,8 @@ parameters:
     label:
       en_US: Context (JSON)
     human_description:
-      en_US: Optional JSON string with additional context for the action
-    llm_description: Optional JSON string with metadata about the action. Example - {"file":"config.json","user":"admin"}
+      en_US: Optional JSON object encoded as a string. Sent in full to Asqav; plain text is sent as a raw field.
+    llm_description: Optional JSON object encoded as a string, sent in full to Asqav. Plain text is wrapped in a raw field. Example - {"file":"config.json","user":"admin"}
     form: llm
   - name: action_ref
     type: string
@@ -51,11 +51,14 @@ output_schema:
       type: string
       description: Human-readable explanation of a denial.
     attestation_hash:
-      type: string
+      type: [string, "null"]
       description: Hash of the attestation for a content or policy block. Null otherwise.
+    denial_signature_id:
+      type: [string, "null"]
+      description: Public signature ID for a recorded denial when supplied by Asqav. Null otherwise.
     signed_deny:
-      type: object
-      description: Verifiable signed denial for a policy block. Null otherwise.
+      type: [object, "null"]
+      description: Signed denial envelope when supplied by Asqav. May be null even for a policy block.
     signature_id:
       type: string
       description: The signature ID when authorized. Starts with sig_.
@@ -69,5 +72,5 @@ output_schema:
       type: string
       description: Public URL to verify the signature.
     signature_b64:
-      type: string
+      type: [string, "null"]
       description: Base64-encoded ML-DSA-65 signature.

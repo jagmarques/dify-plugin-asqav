@@ -1,50 +1,75 @@
 # Asqav Dify Plugin
 
-Asqav adds AI agent governance to your Dify workflows. It checks every agent action against your policies before it runs, blocks anything out of bounds, and cryptographically signs the rest into a tamper-evident audit trail you can verify later.
-
-## Overview
-
-Asqav is the evidence layer for AI agents. This plugin connects your Dify deployment to the Asqav API so each action an agent takes is reviewed before your workflow commits to it. An allowed action is signed with the post-quantum signature ML-DSA-65 and recorded in a verifiable audit trail. A blocked action leaves a forensic record of the attempt instead. Either way you keep provable evidence of what your agents tried to do, which makes compliance reviews and incident investigations far easier.
-
-The plugin calls the Asqav cloud API directly from your Dify deployment. Only a minimal metadata bag is retained alongside a hash of the rest: action type, agent ID, session ID, model name, and tool name, in line with GDPR data minimization. If you prefer client-side hashing, you can run the Asqav Python SDK in hash-only mode alongside this plugin.
+Use Asqav tools at selected points in a Dify workflow to sign an action, query a signature, or create an approval session. You choose which actions reach these tools and how the workflow responds.
 
 ## Configuration
 
-Setting up Asqav takes three short steps:
+1. Sign up at [asqav.com](https://asqav.com) and create an API key beginning with `sk_`.
+2. Create an agent through the Asqav dashboard or SDK. Copy its ID, which begins with `agt_`.
+3. In Dify, open Plugins and select Asqav. Enter the API key and Agent ID. Credential validation checks that the key can access the agent.
 
-- **Get your API key:** sign up at asqav.com and create an API key. It starts with `sk_`.
-- **Create an agent:** create an agent through the Asqav dashboard or SDK. Its ID starts with `agent_`.
-- **Authorize the plugin:** in Dify, go to Plugins, open Asqav, and enter your API key and Agent ID to enable the tool.
+Request Action also needs an active signing group configured for that agent and an account with approval quorum access. An agent ID alone does not configure approvers.
 
-## Tools
+## Sign Action
 
-The Asqav plugin provides three actions for governing and proving agent activity.
+Send an `action_type`, such as `read:data` or `tool:execute`, and optional `context`. The context must be a JSON object encoded as a string. Plain text is sent as `{"raw": "your text"}`; JSON arrays and scalar values are rejected.
 
-### Sign Action
+A successful sign returns `authorized: true` with the signature and action IDs. It includes a timestamp and verification URL. Signature bytes may be null. A refused sign returns `authorized: false` with a reason. Asqav may include a `signed_deny` envelope or a `denial_signature_id`; either can be absent. A refusal caused by a halt or delegation may lack a signed denial. The same applies to quarantine and other refusals.
 
-Signs an agent action with ML-DSA-65. You provide an action type, such as `read:data` or `tool:execute`, plus optional context. You can also pass an optional `action_ref` to label the action so a pair of receipts can be linked later. The response includes an `authorized` flag so your workflow can branch on the decision instead of failing. An allowed action returns its signature, identifiers, timestamp, and a public verification URL. A blocked action returns a clear reason along with a signed denial receipt that is itself verifiable.
+For a step with a side effect:
 
-### Verify Signature
+1. Place Sign Action immediately before the step.
+2. Add an IF/ELSE branch that continues only when `authorized` equals `true`.
+3. Route `false` and tool errors to a stop or review path. Do not connect an error fallback to the protected step.
 
-Verifies a signature by its ID. This is a public action that needs no authentication, so anyone can confirm that a given action was genuinely signed, who signed it, when, and with which algorithm.
+The tool does not execute or intercept other nodes. A signature records the submitted action; it does not prove that a later step ran. Passing the same optional `action_ref` before and after a step links those receipts without proving execution.
 
-### Request Action
+## Verify Signature
 
-Creates a multi-party signing session for high-risk actions. The action stays pending until enough approvers have signed off, which makes it a natural pre-execution gate for sensitive steps in a workflow.
+Pass a `signature_id` to query Asqav's hosted verification endpoint. The response includes the verification result and available action details. Private receipt fields can be null.
 
-## Usage
+The outbound verification request sends no API key. Dify still requires the provider's API key and Agent ID during plugin setup. This tool uses the hosted service; it does not perform offline signature verification.
 
-Asqav fits into both Chatflow / Workflow apps and Agent apps:
+## Request Action
 
-- **Chatflow or Workflow:** add an Asqav node before the step you want to govern, choose the Sign Action or Request Action tool, and branch on the `authorized` result so the workflow only proceeds when the action is permitted. To link a before-and-after pair of receipts for the same action, pass the same `action_ref` to both signs.
-- **Agent app:** add the Asqav tool so the agent signs its actions as it works, building a verifiable record of everything it does without changing how the agent behaves.
+Provide an `action_type` and optional `params`, with the same JSON-object or plain-text format as Sign Action context. The tool returns the session ID and status immediately, with approval counts and expiry.
 
-## Resources
+Request Action has no `authorized` output and does not wait for approvals. To protect a later step, keep the workflow stopped while the session is pending. Collect approvals through Asqav and query the session through the Asqav API. Continue only after checking that the matching session is approved and unexpired. Treat an expired or rejected session as a stop. Stop if the session is missing or the check fails. Session approval and execution of your workflow step are separate operations.
 
-- **Documentation:** [asqav.com/docs](https://asqav.com/docs)
-- **Python SDK:** [PyPI](https://pypi.org/project/asqav/)
-- **Plugin source:** [GitHub](https://github.com/jagmarques/dify-plugin-asqav)
+The plugin exposes session creation. Approval collection and status polling require separate API calls or workflow logic. See [Asqav documentation](https://asqav.com/docs) for the signing-group API.
 
-## Contact
+## Agent apps
 
-Built by Asqav. Learn more at [asqav.com](https://asqav.com).
+Adding these tools makes them available to the agent. Coverage depends on whether the agent calls them; it does not automatically capture every action. Use explicit workflow nodes and branches when a step must require authorization.
+
+## Data handling
+
+Sign Action sends the complete supplied context to `api.asqav.com`, and Request Action sends the complete supplied parameters. This plugin does not hash payloads locally. Omit sensitive data you do not want sent to Asqav. Running the Python SDK separately does not change this plugin's request path.
+
+Asqav's service processes those requests under its [privacy policy](https://asqav.com/privacy). The plugin does not write payloads to its own local storage; Dify manages credentials and workflow data under your deployment's settings. Execution logs may retain those inputs or outputs. See [PRIVACY.md](PRIVACY.md) for the transmitted fields.
+
+## Development
+
+The runner uses Python 3.12. Install the runtime and test dependencies, then run the tests:
+
+```sh
+python -m pip install -r requirements.txt -r requirements-dev.txt
+python -m pytest
+```
+
+The consumer tests load the plugin through the Dify SDK and use HTTP fixtures. They do not establish a live service result or a complete Dify workflow run.
+
+Package with the Dify Plugin CLI and check the archive before distribution:
+
+```sh
+dify plugin package . -o asqav.difypkg
+python scripts/check_package.py asqav.difypkg
+```
+
+## License and contact
+
+The plugin is source-available under the [Elastic License 2.0](LICENSE). The complete license terms are included in the package.
+
+[Plugin source](https://github.com/jagmarques/dify-plugin-asqav) · [Python SDK](https://pypi.org/project/asqav/) · [Documentation](https://asqav.com/docs)
+
+Contact: info@asqav.com

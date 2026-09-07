@@ -16,3 +16,8 @@ tests/
 .ruff_cache/
 .claude/
 requirements-dev.txt
+scripts/
+.coverage*
+coverage.json
+radon.json
+*.difypkg

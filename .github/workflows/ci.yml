@@ -30,4 +30,17 @@ jobs:
           pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Run smoke tests
-        run: pytest -v
+        run: |
+          context=$(python scripts/check_quality.py --fingerprint)
+          python -m coverage run --context="$context" --source=tools,provider,scripts -m pytest -v
+
+      - name: Package and check distribution
+        run: |
+          curl -fsSL https://github.com/langgenius/dify-plugin-daemon/releases/download/0.6.10/dify-plugin-linux-amd64 -o "$RUNNER_TEMP/dify"
+          echo "0cef74bcae375a4337c2ff7d42e4787717981a795e1c23cf56bb27ec07ec8304  $RUNNER_TEMP/dify" | sha256sum --check
+          chmod +x "$RUNNER_TEMP/dify"
+          "$RUNNER_TEMP/dify" plugin package . -o "$RUNNER_TEMP/asqav.difypkg"
+          context=$(python scripts/check_quality.py --fingerprint)
+          python -m coverage run --append --context="$context" --source=tools,provider,scripts scripts/check_package.py "$RUNNER_TEMP/asqav.difypkg"
+          python -m coverage json --show-contexts
+          python scripts/check_quality.py coverage.json
