@@ -6,7 +6,7 @@ Use Asqav tools at selected points in a Dify workflow to sign an action, query a
 
 1. Sign up at [asqav.com](https://asqav.com) and create an API key beginning with `sk_`.
 2. Create an agent through the Asqav dashboard or SDK. Copy its ID, which begins with `agt_`.
-3. In Dify, open Plugins, select Asqav, and enter the API key and Agent ID. Credential validation checks that the key can access the agent.
+3. In Dify, open Plugins and select Asqav. Enter the API key and Agent ID. Credential validation checks that the key can access the agent.
 
 Request Action also needs an active signing group configured for that agent and an account with approval quorum access. An agent ID alone does not configure approvers.
 
@@ -14,7 +14,7 @@ Request Action also needs an active signing group configured for that agent and 
 
 Send an `action_type`, such as `read:data` or `tool:execute`, and optional `context`. The context must be a JSON object encoded as a string. Plain text is sent as `{"raw": "your text"}`; JSON arrays and scalar values are rejected.
 
-A successful sign returns `authorized: true`, identifiers, timestamp, signature, and a verification URL. A refused sign returns `authorized: false` with a reason. Asqav may include a `signed_deny` envelope or a `denial_signature_id`; either can be absent. Halt, delegation, quarantine, and other refusals do not always carry a signed denial.
+A successful sign returns `authorized: true` with the signature and action IDs. It includes a timestamp and verification URL. Signature bytes may be null. A refused sign returns `authorized: false` with a reason. Asqav may include a `signed_deny` envelope or a `denial_signature_id`; either can be absent. A refusal caused by a halt or delegation may lack a signed denial. The same applies to quarantine and other refusals.
 
 For a step with a side effect:
 
@@ -32,9 +32,9 @@ The outbound verification request sends no API key. Dify still requires the prov
 
 ## Request Action
 
-Provide an `action_type` and optional `params`, with the same JSON-object or plain-text format as Sign Action context. The tool creates an approval session and returns its ID, status, approval counts, and expiry immediately.
+Provide an `action_type` and optional `params`, with the same JSON-object or plain-text format as Sign Action context. The tool returns the session ID and status immediately, with approval counts and expiry.
 
-Request Action has no `authorized` output and does not wait for approvals. To protect a later step, keep the workflow stopped while the session is pending. Collect approvals through Asqav and query the session through the Asqav API. Continue only after checking that the matching session is approved and unexpired. Treat expired, rejected, missing, and failed checks as a stop. Session approval and execution of your workflow step are separate operations.
+Request Action has no `authorized` output and does not wait for approvals. To protect a later step, keep the workflow stopped while the session is pending. Collect approvals through Asqav and query the session through the Asqav API. Continue only after checking that the matching session is approved and unexpired. Treat an expired or rejected session as a stop. Stop if the session is missing or the check fails. Session approval and execution of your workflow step are separate operations.
 
 The plugin exposes session creation. Approval collection and status polling require separate API calls or workflow logic. See [Asqav documentation](https://asqav.com/docs) for the signing-group API.
 
@@ -46,7 +46,7 @@ Adding these tools makes them available to the agent. Coverage depends on whethe
 
 Sign Action sends the complete supplied context to `api.asqav.com`, and Request Action sends the complete supplied parameters. This plugin does not hash payloads locally. Omit sensitive data you do not want sent to Asqav. Running the Python SDK separately does not change this plugin's request path.
 
-Asqav's service processes those requests under its [privacy policy](https://asqav.com/privacy). The plugin does not write payloads to its own local storage; Dify manages credentials, workflow inputs, outputs, and any execution logs under your deployment's settings. See [PRIVACY.md](PRIVACY.md) for the transmitted fields.
+Asqav's service processes those requests under its [privacy policy](https://asqav.com/privacy). The plugin does not write payloads to its own local storage; Dify manages credentials and workflow data under your deployment's settings. Execution logs may retain those inputs or outputs. See [PRIVACY.md](PRIVACY.md) for the transmitted fields.
 
 ## Development
 
