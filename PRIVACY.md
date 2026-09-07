@@ -4,7 +4,7 @@
 
 The plugin calls `https://api.asqav.com/api/v1`. It sends:
 
-- The API key authenticates credential validation and signing requests. It also authenticates approval-session creation.
+- The API key is sent in an authentication header for credential validation and signing. Approval-session creation uses the same header.
 - The configured Agent ID identifies the agent for lookup and signing. Approval-session creation uses the same ID.
 - Sign Action sends the action type and complete user-provided context. It also sends an optional action reference.
 - The action type and full user-provided parameters for Request Action.
