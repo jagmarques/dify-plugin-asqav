@@ -5,36 +5,70 @@ identity:
     en_US: Sign Action
 description:
   human:
-    en_US: Cryptographically sign an agent action with ML-DSA-65, creating an independently verifiable entry in the Asqav audit trail. Returns the signature ID and verification URL.
-  llm: Sign an agent action with ML-DSA-65 for AI agent governance and compliance. Provide an action_type string (e.g. "read:data", "api:call", "tool:execute") and optional context as a JSON string. Place this node at the boundary you want to govern, before an irreversible side effect to gate and sign it, or on the request before the agent runs. Returns a JSON object with an "authorized" boolean. When true, it includes signature_id, action_id, timestamp, verification_url, and signature_b64. When false, it includes a "reason" (policy_blocked, emergency_halt, delegation_denied, quarantine, or denied) and a human-readable "detail" so the workflow can branch instead of failing. To link a before-and-after pair of receipts for one action, pass the same action_ref to both.
+    en_US: Save a signed record of a selected action. Choose Standard signing or a profile observation with an exportable
+      receipt.
+  llm: Save a selected action in Asqav. Standard mode returns authorized=true when the sign endpoint accepts the request;
+    this is not proof of policy evaluation or execution. Profile mode saves an observation receipt, derives the action reference
+    and always returns authorized=false. It does not approve a later action. Route tool errors to a stop path.
 parameters:
-  - name: action_type
-    type: string
-    required: true
+- name: action_type
+  type: string
+  required: true
+  label:
+    en_US: Action Type
+  human_description:
+    en_US: Type of action being signed, e.g. "read:data", "api:call", "tool:execute"
+  llm_description: The action type string that identifies the kind of action being signed. Examples - "read:data", "api:call",
+    "tool:execute", "deploy:production".
+  form: llm
+- name: context
+  type: string
+  required: false
+  label:
+    en_US: Context (JSON)
+  human_description:
+    en_US: JSON object sent in full to Asqav. Standard mode also accepts plain text. Profile mode requires strict JSON with
+      integers only.
+  llm_description: JSON object sent in full to Asqav. Standard mode also accepts plain text. Profile mode requires strict
+    JSON with integers only.
+  form: llm
+- name: action_ref
+  type: string
+  required: false
+  label:
+    en_US: Action reference
+  human_description:
+    en_US: 'Standard: optional reference. Profile: leave empty to derive it from this action and context.'
+  llm_description: Profile mode derives sha256 of the canonical Action. An explicit value must match. Use iteration_id to
+    correlate different actions in one workflow run.
+  form: llm
+- name: receipt_mode
+  type: select
+  required: false
+  default: standard
+  label:
+    en_US: Receipt mode
+  human_description:
+    en_US: Standard signs the submitted action. Profile saves an observation and never approves execution.
+  llm_description: Select standard or profile. Profile preserves the full receipt and requires an iteration_id.
+  form: form
+  options:
+  - value: standard
     label:
-      en_US: Action Type
-    human_description:
-      en_US: Type of action being signed, e.g. "read:data", "api:call", "tool:execute"
-    llm_description: The action type string that identifies the kind of action being signed. Examples - "read:data", "api:call", "tool:execute", "deploy:production".
-    form: llm
-  - name: context
-    type: string
-    required: false
+      en_US: Standard
+  - value: profile
     label:
-      en_US: Context (JSON)
-    human_description:
-      en_US: Optional JSON object encoded as a string. Sent in full to Asqav; plain text is sent as a raw field.
-    llm_description: Optional JSON object encoded as a string, sent in full to Asqav. Plain text is wrapped in a raw field. Example - {"file":"config.json","user":"admin"}
-    form: llm
-  - name: action_ref
-    type: string
-    required: false
-    label:
-      en_US: Action reference
-    human_description:
-      en_US: Optional shared reference to link two receipts for the same action, e.g. a permit sign before the action and an outcome sign after it.
-    llm_description: Optional shared reference string. Pass the same value to a sign placed before the side-effecting step and a sign placed after it to link the permit receipt and the outcome receipt for one action. It records that both receipts refer to the same action; it does not assert the action ran.
-    form: llm
+      en_US: Profile observation
+- name: iteration_id
+  type: string
+  required: false
+  label:
+    en_US: Workflow run ID
+  human_description:
+    en_US: Required for Profile mode. Use one unique ID for this logical run, shared across its steps.
+  llm_description: Stable run correlation ID, at most 128 characters; required in profile mode. Do not reuse a fixed example
+    across runs.
+  form: llm
 extra:
   python:
     source: tools/sign_action.py
@@ -43,31 +77,38 @@ output_schema:
   properties:
     authorized:
       type: boolean
-      description: True if the action was signed and permitted, false if blocked by policy, halt, delegation, or quarantine.
+      description: 'Standard: the sign endpoint accepted this request. Profile observations always return false. Does not
+        prove execution or complete profile verification.'
     reason:
       type: string
-      description: Machine reason when authorized is false - policy_blocked, emergency_halt, delegation_denied, quarantine, or denied. Absent when authorized.
+      description: Reason for false authorization, including observation for a successfully saved profile observation.
     detail:
       type: string
-      description: Human-readable explanation of a denial.
+      description: Explanation of an observation or refusal.
     attestation_hash:
-      type: [string, "null"]
+      type:
+      - string
+      - 'null'
       properties: {}
       description: Hash of the attestation for a content or policy block. Null otherwise.
     denial_signature_id:
-      type: [string, "null"]
+      type:
+      - string
+      - 'null'
       properties: {}
       description: Public signature ID for a recorded denial when supplied by Asqav. Null otherwise.
     signed_deny:
-      type: [object, "null"]
+      type:
+      - object
+      - 'null'
       properties: {}
       description: Signed denial envelope when supplied by Asqav. May be null even for a policy block.
     signature_id:
       type: string
-      description: The signature ID when authorized. Starts with sig_.
+      description: ID of a saved signature, including observations whose authorized output is false.
     action_id:
       type: string
-      description: The signed action ID when authorized.
+      description: ID of the action recorded by the signature.
     timestamp:
       type: number
       description: Unix epoch timestamp (seconds) of the signature.
@@ -75,6 +116,37 @@ output_schema:
       type: string
       description: Public URL to verify the signature.
     signature_b64:
-      type: [string, "null"]
+      type:
+      - string
+      - 'null'
       properties: {}
       description: Base64-encoded ML-DSA-65 signature.
+    decision:
+      type: string
+      description: Signed profile decision; observations do not approve execution.
+    policy_decision:
+      type: string
+      description: Profile observations request none.
+    anchor_pending:
+      type: boolean
+      description: True for HTTP202 or unfinished anchoring. Recheck this receipt; do not sign again.
+    receipt:
+      type: object
+      description: Exact returned payload, signature object and anchors. Retain this original; the public verification view
+        may redact fields.
+      properties: {}
+    receipt_json:
+      type: string
+      description: Canonical JSON serialization of the retained receipt, with the original signature encoding.
+    action_ref:
+      type: string
+      description: SHA256 reference derived from this action type and context.
+    iteration_id:
+      type: string
+      description: Logical workflow run correlation ID.
+    policy_enforcement:
+      type:
+      - string
+      - 'null'
+      properties: {}
+      description: Server observation downgrade status, when supplied.

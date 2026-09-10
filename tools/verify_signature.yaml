@@ -5,18 +5,48 @@ identity:
     en_US: Verify Signature
 description:
   human:
-    en_US: Verify an Asqav signature by its ID. The Asqav verification request sends no API key; Dify provider setup still requires credentials. Returns whether the signature is valid, the signing agent, and the action details.
-  llm: Verify an Asqav signature by its signature ID. Returns verification status, the signing agent name/ID, the action type, and the timestamp. The outbound verification request sends no API key. Dify provider setup still requires credentials. This is a hosted check, not offline verification.
+    en_US: Check a signed Asqav record. Supply the original receipt for profile verification.
+  llm: Verify a stored signature ID, or pass its exact receipt_json for profile checks against retained issuer evidence. Optional
+    context_json is sent in full. Refresh anchors explicitly to verify a separately returned updated envelope. Verification
+    never authorizes execution.
 parameters:
-  - name: signature_id
-    type: string
-    required: true
-    label:
-      en_US: Signature ID
-    human_description:
-      en_US: The signature ID to verify (e.g. sig_abc123)
-    llm_description: The Asqav signature ID to verify. Usually starts with "sig_".
-    form: llm
+- name: signature_id
+  type: string
+  required: true
+  label:
+    en_US: Signature ID
+  human_description:
+    en_US: The signature ID to verify (e.g. sig_abc123)
+  llm_description: The Asqav signature ID to verify. Usually starts with "sig_".
+  form: llm
+- name: receipt_json
+  type: string
+  required: false
+  label:
+    en_US: Original receipt
+  human_description:
+    en_US: Map receipt_json from Profile observation Sign Action. Keep the original payload and signature.
+  llm_description: Map receipt_json from Profile observation Sign Action. Keep the original payload and signature.
+  form: llm
+- name: context_json
+  type: string
+  required: false
+  label:
+    en_US: Original context
+  human_description:
+    en_US: Optional original JSON context to recheck its digest and action reference; sent in full to Asqav.
+  llm_description: Optional original JSON context to recheck its digest and action reference; sent in full to Asqav.
+  form: llm
+- name: refresh_anchors
+  type: boolean
+  required: false
+  label:
+    en_US: Refresh timestamp proofs
+  human_description:
+    en_US: Fetch current anchor proofs, preserve the original, and return the exact checked envelope separately.
+  llm_description: Fetch current anchor proofs, preserve the original, and return the exact checked envelope separately.
+  form: form
+  default: false
 extra:
   python:
     source: tools/verify_signature.py
@@ -25,20 +55,27 @@ output_schema:
   properties:
     verified:
       type: boolean
-      description: True if the signature is valid.
+      description: 'ID-only mode: hosted signature rollup. With receipt_json: all required profile checks passed. Never permission
+        to execute.'
     signature_id:
       type: string
       description: The verified signature ID.
     agent_id:
-      type: [string, "null"]
+      type:
+      - string
+      - 'null'
       properties: {}
       description: ID of the agent that produced the signature.
     agent_name:
-      type: [string, "null"]
+      type:
+      - string
+      - 'null'
       properties: {}
       description: Display name of the signing agent.
     action_type:
-      type: [string, "null"]
+      type:
+      - string
+      - 'null'
       properties: {}
       description: The action type that was signed.
     algorithm:
@@ -50,3 +87,63 @@ output_schema:
     verification_url:
       type: string
       description: Public URL to verify the signature.
+    verification_detail:
+      type: object
+      description: Hosted verification axes, preserving false and null. They assess the stored ID, not an exact supplied envelope.
+      properties: {}
+    execution_evidence:
+      type:
+      - object
+      - 'null'
+      description: Hosted execution evidence; null when unavailable.
+      properties: {}
+    anchor_confirmed:
+      type: boolean
+      description: Whether the service reports a cryptographically confirmed anchor.
+    signature_valid:
+      type:
+      - boolean
+      - 'null'
+      description: Hosted signature axis; null if unavailable.
+      properties: {}
+    stale_pending:
+      type:
+      - boolean
+      - 'null'
+      description: Whether pending anchor evidence is stale; null if unavailable.
+      properties: {}
+    profile_verdict:
+      type: string
+      description: verified only after exact-receipt profile checks pass; otherwise unverified.
+    profile_failure_class:
+      type:
+      - string
+      - 'null'
+      properties: {}
+      description: invalid for demonstrated failure, unverifiable for missing evidence, null when verified.
+    profile_check_limit:
+      type: string
+      description: Checks not established by this endpoint.
+    profile_verification:
+      type: object
+      description: Checks on the exact submitted envelope, including anchor, key, chain and policy evidence.
+      properties: {}
+    receipt_json:
+      type: string
+      description: The original input receipt, preserved unchanged.
+    verified_receipt_json:
+      type: string
+      description: Exact envelope checked, including refreshed proofs when requested. Save separately from the original.
+    anchors_refreshed:
+      type: boolean
+      description: Whether the checked anchor bytes differ from the original receipt.
+    authorized:
+      type: boolean
+      description: Always false for profile verification; this tool does not approve an action.
+    expired:
+      type:
+      - boolean
+      - 'null'
+      properties: {}
+      description: Whether the signed validity window has ended; historical verification can still pass.
+      default: null
