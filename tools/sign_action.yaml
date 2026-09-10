@@ -52,12 +52,15 @@ output_schema:
       description: Human-readable explanation of a denial.
     attestation_hash:
       type: [string, "null"]
+      properties: {}
       description: Hash of the attestation for a content or policy block. Null otherwise.
     denial_signature_id:
       type: [string, "null"]
+      properties: {}
       description: Public signature ID for a recorded denial when supplied by Asqav. Null otherwise.
     signed_deny:
       type: [object, "null"]
+      properties: {}
       description: Signed denial envelope when supplied by Asqav. May be null even for a policy block.
     signature_id:
       type: string
@@ -73,4 +76,5 @@ output_schema:
       description: Public URL to verify the signature.
     signature_b64:
       type: [string, "null"]
+      properties: {}
       description: Base64-encoded ML-DSA-65 signature.

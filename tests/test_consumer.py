@@ -36,6 +36,8 @@ def consumer(monkeypatch):
 
     def respond(request):
         requests.append(request)
+        if "content" in reply:
+            return httpx.Response(reply["status"], content=reply["content"])
         return httpx.Response(reply["status"], json=reply["json"])
 
     with httpx.Client(transport=httpx.MockTransport(respond)) as client:

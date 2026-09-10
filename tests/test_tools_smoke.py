@@ -71,7 +71,7 @@ def test_sign_action_posts_expected_body(
             json_data={
                 "signature_id": "sig_123",
                 "action_id": "act_456",
-                "timestamp": "2026-05-23T00:00:00Z",
+                "timestamp": 1779494400.0,
                 "verification_url": "https://api.asqav.com/api/v1/verify/sig_123",
             },
         ),
@@ -105,7 +105,7 @@ def test_sign_action_passes_action_ref_when_given(
             json_data={
                 "signature_id": "sig_ref",
                 "action_id": "act_ref",
-                "timestamp": "2026-05-23T00:00:00Z",
+                "timestamp": 1779494400.0,
                 "verification_url": "https://api.asqav.com/api/v1/verify/sig_ref",
             },
         ),
@@ -137,7 +137,7 @@ def test_sign_action_treats_invalid_json_context_as_raw(
             json_data={
                 "signature_id": "sig_x",
                 "action_id": "act_x",
-                "timestamp": "2026-05-23T00:00:00Z",
+                "timestamp": 1779494400.0,
                 "verification_url": "https://api.asqav.com/api/v1/verify/sig_x",
             },
         ),

@@ -8,6 +8,7 @@ from dify_plugin.entities.tool import ToolInvokeMessage
 
 from tools._inputs import object_parameter, path_identifier, required_text
 from tools._outputs import emit
+from tools._responses import response_payload
 
 API_BASE = "https://api.asqav.com/api/v1"
 
@@ -35,12 +36,9 @@ class RequestActionTool(Tool):
         response.raise_for_status()
         data = response.json()
 
-        yield from emit(self, {
-            "session_id": data["session_id"],
-            "status": data["status"],
-            "approvals_required": data["approvals_required"],
-            "signatures_collected": data["signatures_collected"],
-            "action_type": data["action_type"],
-            "created_at": data["created_at"],
-            "expires_at": data["expires_at"],
-        })
+        yield from emit(self, response_payload(data, "Request Action", (
+            ("session_id", "text"), ("status", "text"),
+            ("approvals_required", "positive_integer"),
+            ("signatures_collected", "nonnegative_integer"),
+            ("action_type", "text"), ("created_at", "text"), ("expires_at", "text"),
+        )))

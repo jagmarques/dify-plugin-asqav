@@ -31,12 +31,15 @@ output_schema:
       description: The verified signature ID.
     agent_id:
       type: [string, "null"]
+      properties: {}
       description: ID of the agent that produced the signature.
     agent_name:
       type: [string, "null"]
+      properties: {}
       description: Display name of the signing agent.
     action_type:
       type: [string, "null"]
+      properties: {}
       description: The action type that was signed.
     algorithm:
       type: string
