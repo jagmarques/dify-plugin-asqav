@@ -1,11 +1,12 @@
-version: 0.0.7
+version: 0.0.8
 type: plugin
 author: asqav
 name: asqav
 label:
   en_US: Asqav
 description:
-  en_US: Connect Dify to Asqav with your API key to sign selected actions, check signatures, and request multi-party approval.
+  en_US: Save signed records of selected workflow actions in Asqav and check them later. Connect with your Asqav API key and
+    agent ID.
 icon: icon.svg
 resource:
   memory: 268435456
@@ -17,21 +18,21 @@ resource:
       size: 1048576
 plugins:
   tools:
-    - provider/asqav.yaml
+  - provider/asqav.yaml
 meta:
   version: 0.0.4
   arch:
-    - amd64
-    - arm64
+  - amd64
+  - arm64
   runner:
     language: python
-    version: "3.12"
+    version: '3.12'
     entrypoint: main
-created_at: 2026-04-08T12:00:00.000000+00:00
+created_at: '2026-04-08T12:00:00Z'
 repo: https://github.com/jagmarques/dify-plugin-asqav
 contact: info@asqav.com
 network:
   domains:
-    - api.asqav.com
+  - api.asqav.com
 privacy: PRIVACY.md
 verified: false

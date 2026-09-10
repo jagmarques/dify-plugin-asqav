@@ -4,10 +4,11 @@ identity:
   label:
     en_US: Asqav
   description:
-    en_US: Use your Asqav API key to sign selected actions, check signatures, and request multi-party approval.
+    en_US: Save signed records of selected workflow actions in Asqav and check them later. Connect with your Asqav API key
+      and agent ID.
   icon: icon.svg
   tags:
-    - utilities
+  - utilities
 credentials_for_provider:
   asqav_api_key:
     type: secret-input
@@ -30,9 +31,9 @@ credentials_for_provider:
       en_US: Create an agent with the Asqav SDK or API in the same organization as the key, then copy its agt_ ID.
     url: https://www.asqav.com/docs/agents
 tools:
-  - tools/sign_action.yaml
-  - tools/verify_signature.yaml
-  - tools/request_action.yaml
+- tools/sign_action.yaml
+- tools/verify_signature.yaml
+- tools/request_action.yaml
 extra:
   python:
     source: provider/asqav.py
