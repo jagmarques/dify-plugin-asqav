@@ -33,7 +33,22 @@ jobs:
         timeout-minutes: 5
         run: |
           context=$(python scripts/check_quality.py --fingerprint)
-          python -m coverage run --context="$context" --source=tools,provider,scripts -m pytest -v -o faulthandler_timeout=120
+          python - "$context" <<'PYTEST_BOOTSTRAP'
+          import faulthandler
+          import sys
+
+          faulthandler.enable()
+          faulthandler.dump_traceback_later(120, repeat=True)
+          from gevent import monkey
+          monkey.patch_all(sys=True)
+
+          from coverage.cmdline import main
+          raise SystemExit(main([
+              "run", "--concurrency=gevent", "--context=" + sys.argv[1],
+              "--source=tools,provider,scripts", "-m", "pytest", "-v",
+              "-o", "faulthandler_timeout=120",
+          ]))
+          PYTEST_BOOTSTRAP
 
       - name: Package and check distribution
         run: |
@@ -42,6 +57,6 @@ jobs:
           chmod +x "$RUNNER_TEMP/dify"
           "$RUNNER_TEMP/dify" plugin package . -o "$RUNNER_TEMP/asqav.difypkg"
           context=$(python scripts/check_quality.py --fingerprint)
-          python -m coverage run --append --context="$context" --source=tools,provider,scripts scripts/check_package.py "$RUNNER_TEMP/asqav.difypkg"
+          python -m coverage run --concurrency=gevent --append --context="$context" --source=tools,provider,scripts scripts/check_package.py "$RUNNER_TEMP/asqav.difypkg"
           python -m coverage json --show-contexts
           python scripts/check_quality.py coverage.json
