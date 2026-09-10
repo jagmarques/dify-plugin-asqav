@@ -8,6 +8,7 @@ from dify_plugin.entities.tool import ToolInvokeMessage
 
 from tools._inputs import object_parameter, path_identifier, required_text
 from tools._outputs import emit
+from tools._responses import optional_text, response_payload
 
 API_BASE = "https://api.asqav.com/api/v1"
 
@@ -50,14 +51,12 @@ class SignActionTool(Tool):
         response.raise_for_status()
         data = response.json()
 
-        yield from emit(self, {
-            "authorized": True,
-            "signature_id": data["signature_id"],
-            "action_id": data["action_id"],
-            "timestamp": data["timestamp"],
-            "verification_url": data["verification_url"],
-            "signature_b64": data.get("signature_b64"),
-        })
+        result = response_payload(data, "Sign Action", (
+            ("signature_id", "text"), ("action_id", "text"),
+            ("timestamp", "number"), ("verification_url", "text"),
+        ))
+        result["signature_b64"] = optional_text(data, "signature_b64", "Sign Action")
+        yield from emit(self, {"authorized": True, **result})
 
 
 def _denied_result(response: httpx.Response) -> dict[str, Any]:
@@ -76,13 +75,19 @@ def _denied_result(response: httpx.Response) -> dict[str, Any]:
 
     if isinstance(detail, dict):
         is_policy = detail.get("error") == "action_denied"
-        return {
-            "authorized": False,
-            "reason": "policy_blocked" if is_policy else "denied",
+        fields = response_payload({
             "detail": detail.get("error", "action_denied"),
             "attestation_hash": detail.get("attestation_hash"),
             "denial_signature_id": detail.get("denial_signature_id"),
             "signed_deny": detail.get("signed_deny"),
+        }, "Sign Action", (
+            ("detail", "text"), ("attestation_hash", "text_or_null"),
+            ("denial_signature_id", "text_or_null"), ("signed_deny", "object_or_null"),
+        ))
+        return {
+            "authorized": False,
+            "reason": "policy_blocked" if is_policy else "denied",
+            **fields,
         }
 
     text = detail if isinstance(detail, str) and detail else "Action denied by policy"

@@ -1,11 +1,11 @@
-version: 0.0.6
+version: 0.0.7
 type: plugin
 author: asqav
 name: asqav
 label:
   en_US: Asqav
 description:
-  en_US: Sign selected workflow actions, check signatures through the Asqav API, and create multi-party approval sessions.
+  en_US: Connect Dify to Asqav with your API key to sign selected actions, check signatures, and request multi-party approval.
 icon: icon.svg
 resource:
   memory: 268435456

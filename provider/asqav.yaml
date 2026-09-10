@@ -4,7 +4,7 @@ identity:
   label:
     en_US: Asqav
   description:
-    en_US: Sign selected actions, query hosted signature verification, and request approval sessions through Asqav.
+    en_US: Use your Asqav API key to sign selected actions, check signatures, and request multi-party approval.
   icon: icon.svg
   tags:
     - utilities
@@ -17,8 +17,8 @@ credentials_for_provider:
     placeholder:
       en_US: Enter your Asqav API key (sk_...)
     help:
-      en_US: Get your API key at asqav.com
-    url: https://asqav.com
+      en_US: Verify your email, then open Settings > API. Keep agents read and write access. Copy the full key once.
+    url: https://www.asqav.com/dashboard/#/settings/api
   asqav_agent_id:
     type: text-input
     required: true
@@ -27,7 +27,8 @@ credentials_for_provider:
     placeholder:
       en_US: Your Asqav agent ID (agt_...)
     help:
-      en_US: The agent ID to use for signing actions
+      en_US: Create an agent with the Asqav SDK or API in the same organization as the key, then copy its agt_ ID.
+    url: https://www.asqav.com/docs/agents
 tools:
   - tools/sign_action.yaml
   - tools/verify_signature.yaml
