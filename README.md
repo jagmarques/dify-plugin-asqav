@@ -1,6 +1,6 @@
 # Asqav Dify Plugin
 
-Connect Dify to [Asqav](https://www.asqav.com/) with your own Asqav API key. Sign selected workflow actions, check signatures through Asqav, and create multi-party approval sessions. You choose which actions reach these tools and how the workflow responds.
+Connect Dify to [Asqav](https://www.asqav.com/) with your own Asqav API key. Use Sign Action at selected workflow steps and Verify Signature to check the resulting signatures. Request Action creates multi-party approval sessions. You choose which actions reach these tools and how the workflow responds.
 
 ## Configuration
 
