@@ -58,7 +58,8 @@ def test_profile_observation_roundtrip_never_authorizes(mocker,status,pending):
 @pytest.mark.parametrize('context', ['{"x":1,"x":2}','{"nested":{"x":1,"x":2}}',
     '{"x":NaN}','{"x":Infinity}','{"x":1.0}','{"x":9007199254740992}',
     '{"x":-9007199254740992}','[]','null','true','not-json', '{"x":"\\ud800"}',
-    '{"x":'+'['*66+'0'+']'*66+'}', '{"x":"'+'a'*1048576+'"}'])
+    '{"x":'+'['*66+'0'+']'*66+'}',
+    pytest.param('{"x":"'+'a'*1048576+'"}', id="oversized-context")])
 def test_invalid_profile_context_never_sends(mocker,context):
     post=mocker.patch('tools.sign_action.httpx.post')
     tool=_make_tool(SignActionTool, {'asqav_api_key':'fixture','asqav_agent_id':'agt_fixture'})
@@ -171,7 +172,8 @@ def test_hosted_response_must_match_requested_signature(mocker):
 
 
 @pytest.mark.parametrize('raw',['{"payload":{},"payload":{}}','[1]','NaN','not-json',
-    '{"payload":'+ '['*1500+'0'+']'*1500+'}', '"'+'a'*1048576+'"'])
+    '{"payload":'+ '['*1500+'0'+']'*1500+'}',
+    pytest.param('"'+'a'*1048576+'"', id="oversized-response")])
 def test_profile_response_parser_refuses_ambiguous_json(raw):
     from tools._profile import profile_response
     with pytest.raises(ValueError):profile_response(raw)
