@@ -9,6 +9,7 @@ from dify_plugin.entities.tool import ToolInvokeMessage
 from tools._inputs import object_parameter, path_identifier, required_text
 from tools._outputs import emit
 from tools._responses import optional_text, response_payload
+from tools._profile import profile_request, profile_response, profile_result, signing_mode
 
 API_BASE = "https://api.asqav.com/api/v1"
 
@@ -26,15 +27,17 @@ class SignActionTool(Tool):
         api_key = required_text(self.runtime.credentials, "asqav_api_key")
         agent_id = path_identifier(self.runtime.credentials, "asqav_agent_id")
         action_type = required_text(tool_parameters, "action_type")
-        context = object_parameter(tool_parameters, "context")
+        mode = signing_mode(tool_parameters)
+        context = object_parameter(tool_parameters, "context") if mode == "standard" else {}
         action_ref = tool_parameters.get("action_ref")
         if action_ref is not None and action_ref != "":
             action_ref = required_text(tool_parameters, "action_ref")
 
         body: dict[str, Any] = {"action_type": action_type, "context": context}
-        # Same action_ref on a pre-action and a post-action sign links the two receipts.
         if action_ref:
             body["action_ref"] = action_ref
+        if mode == "profile":
+            body = profile_request(tool_parameters, action_type)
 
         response = httpx.post(
             f"{API_BASE}/agents/{agent_id}/sign",
@@ -49,7 +52,11 @@ class SignActionTool(Tool):
             return
 
         response.raise_for_status()
-        data = response.json()
+        data = profile_response(response.text) if mode == "profile" else response.json()
+
+        if mode == "profile":
+            yield from emit(self, profile_result(data, body, agent_id, response.status_code))
+            return
 
         result = response_payload(data, "Sign Action", (
             ("signature_id", "text"), ("action_id", "text"),
