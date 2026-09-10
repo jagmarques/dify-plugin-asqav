@@ -59,7 +59,7 @@ The tool does not execute or intercept other nodes. A signature records the subm
 
 Choose **Profile observation** to request a Compliance Receipt from Asqav. Supply a unique workflow run ID as `iteration_id`, and reuse it only for steps belonging to that same logical run. Context must be a JSON object: duplicate members, floating-point numbers, invalid Unicode and integers outside the safe JSON range are rejected before signing.
 
-The tool derives `action_ref` using RFC 8785 canonicalization, checks that the response refers to the requested action, agent and run, and retains the exact `payload`, `signature` and `anchors` as `receipt`. `receipt_json` is its canonical JSON serialization. Save that original: the public verification view may redact fields and cannot replace it.
+The tool derives `action_ref` using RFC8785 canonicalization. It checks that the response belongs to your requested action and agent, with the same run ID. It retains the complete envelope as `receipt`, including its signed payload and timestamp proofs. `receipt_json` is its canonical JSON serialization. Save that original: the public verification view may redact fields and cannot replace it.
 
 Dify explicitly reports in-process capture and requests an **observation**. A saved observation always returns `authorized: false`; it does not approve another node. `anchor_pending: true` means anchoring is unfinished. Retain the receipt and recheck the same signature ID later rather than signing again. Free includes Bitcoin anchoring, which can be pending after signing. Feature restrictions or unavailable anchoring can still produce a tool error; the plugin never falls back silently to Standard mode.
 
@@ -77,7 +77,7 @@ Fresh Bitcoin proofs can still be pending. Enable **Refresh timestamp proofs** w
 
 This is an issuer-hosted check of nested payload receipts, using Asqav's retained public keys and history. External timestamp certificates must chain to Asqav's pinned roots. Bitcoin proof verification uses Blockstream's HTTPS API for best-chain headers and checks the header hash, proof of work and Merkle commitment; it is not an independent Bitcoin node. Missing keys, history, policy material or proofs remain unavailable. Known unsupported receipt families are never reported as verified.
 
-ID-only checks remain available for existing nodes, returning the hosted signature rollup and granular details. They do not establish an exact-receipt profile pass. Revision 09 is an unpublished individual draft, not an IETF standard or certification.
+ID-only checks remain available for existing nodes, returning the hosted signature rollup and detailed results. They do not establish an exact-receipt profile pass. Revision 09 is an unpublished individual draft, not an IETF standard or certification.
 
 ## Request Action
 
