@@ -89,7 +89,11 @@ The plugin exposes session creation. Approval collection and status polling requ
 
 ## Agent apps
 
-Adding these tools makes them available to the agent. Coverage depends on whether the agent calls them; it does not automatically capture every action. Use explicit workflow nodes and branches when a step must require authorization.
+Adding these tools makes them available to the agent. Coverage class:
+**model_invoked** in the Agent path (the model chooses whether to call the
+tool — a step the agent skips is unsigned), **framework_callback** in the
+Workflow path (deterministic tool node). Coverage depends on whether the agent
+calls them; it does not automatically capture every action. Use explicit workflow nodes and branches when a step must require authorization.
 
 ## Data handling
 
