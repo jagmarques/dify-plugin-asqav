@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     name: pytest (Python ${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, hz-ci-light]
     strategy:
       fail-fast: false
       matrix:
@@ -52,8 +52,8 @@ jobs:
 
       - name: Package and check distribution
         run: |
-          curl -fsSL https://github.com/langgenius/dify-plugin-daemon/releases/download/0.6.10/dify-plugin-linux-amd64 -o "$RUNNER_TEMP/dify"
-          echo "0cef74bcae375a4337c2ff7d42e4787717981a795e1c23cf56bb27ec07ec8304  $RUNNER_TEMP/dify" | sha256sum --check
+          curl -fsSL https://github.com/langgenius/dify-plugin-daemon/releases/download/0.6.10/dify-plugin-linux-arm64 -o "$RUNNER_TEMP/dify"
+          echo "dfaf4faed2fc5ff3703c8568b7ebc78bca55b90ea8735580edcd068b603a57e1  $RUNNER_TEMP/dify" | sha256sum --check
           chmod +x "$RUNNER_TEMP/dify"
           "$RUNNER_TEMP/dify" plugin package . -o "$RUNNER_TEMP/asqav.difypkg"
           context=$(python scripts/check_quality.py --fingerprint)
